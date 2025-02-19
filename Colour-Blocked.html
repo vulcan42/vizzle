@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Colour-Blocked</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #36454F;
+      font-family: Arial, sans-serif;
+      touch-action: manipulation;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #E3E846;
+      margin: 10px 0 5px 0;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .instructions {
+      color: #fff;
+      text-align: center;
+      margin: 0 0 8px 0;
+      max-width: 300px;
+      line-height: 1.4;
+      font-size: 0.95em;
+    }
+
+    .grid {
+      display: grid;
+      gap: 2px;
+      background: #ddd;
+      padding: 2px;
+      border-radius: 5px;
+      margin: 8px 0;
+      touch-action: none;
+      grid-template-columns: repeat(8, 1fr);
+    }
+
+    .tile {
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      transition: transform 0.1s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1em;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+      padding: 8px 0;
+    }
+
+    .color-picker {
+      display: flex;
+      gap: 10px;
+    }
+
+    .color-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .color-btn.selected {
+      transform: scale(1.2);
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+
+    #moves {
+      color: #fff;
+      font-size: 1.3em;
+      margin: 0 0 8px 0;
+    }
+
+    #reset {
+      background: #73A9D8;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 24px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    @media (max-width: 600px) {
+      .tile {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9em;
+      }
+      .color-btn {
+        width: 35px;
+        height: 35px;
+      }
+      h1 {
+        font-size: 2em;
+      }
+      .grid {
+        margin: 6px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Colour-Blocked</h1>
+  <div class="instructions">
+    <p>Choose a colour from the buttons below (RGBY), then tap a different colour tile to apply the chosen colour. <br>
+    All continuously connected tiles, vertically or horizontally connected, will change to the selected colour.<br></p>
+    <b>Objective</b>: Make all tiles "Red" in 4 moves! Good Luck.
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <div class="controls">
+    <div id="moves">Moves left: 4</div>
+    <div class="color-picker">
+      <button class="color-btn" style="background: #E36E5D" data-color="#E36E5D"></button>
+      <button class="color-btn" style="background: #5CA587" data-color="#5CA587"></button>
+      <button class="color-btn" style="background: #73A9D8" data-color="#73A9D8"></button>
+      <button class="color-btn" style="background: #E3E846" data-color="#E3E846"></button>
+    </div>
+    <button id="reset">Reset</button>
+  </div>
+
+  <script>
+    // Mapping between letters and hex codes
+    function letterToHex(letter) {
+      if(letter === "R") return "#E36E5D";
+      if(letter === "G") return "#5CA587";
+      if(letter === "B") return "#73A9D8";
+      if(letter === "Y") return "#E3E846";
+      return "";
+    }
+    
+    function hexToLetter(hex) {
+      if(hex === "#E36E5D") return "R";
+      if(hex === "#5CA587") return "G";
+      if(hex === "#73A9D8") return "B";
+      if(hex === "#E3E846") return "Y";
+      return "";
+    }
+
+    // Function to choose text color for contrast (not used since we no longer display text)
+    function getTextColor(hex) {
+      if(hex === "#E3E846") return "#000"; // Yellow gets black text
+      return "#FFF"; // Others get white text
+    }
+
+    // The initial grid array is now defined using letters for readability.
+    const initialGrid = [
+      ['G','G','G','G','G','G','Y','Y'],
+      ['B','B','B','B','B','B','Y','G'],
+      ['B','R','R','R','R','R','Y','G'],
+      ['B','R','R','R','Y','Y','Y','G'],
+      ['B','R','R','G','Y','B','B','G'],
+      ['B','R','R','Y','R','B','B','G'],
+      ['B','Y','Y','Y','B','B','B','G'],
+      ['B','Y','B','B','B','B','B','G'],
+      ['B','Y','G','G','G','G','G','G'],
+      ['Y','Y','R','R','R','R','R','R']
+    ];
+
+    let currentGrid;
+    let selectedColor = null;
+    let movesLeft = 4;
+
+    function createGrid() {
+      const grid = document.getElementById('grid');
+      grid.style.gridTemplateColumns = `repeat(${initialGrid[0].length}, 1fr)`;
+      
+      initialGrid.forEach((row, i) => {
+        row.forEach((letter, j) => {
+          const hex = letterToHex(letter);
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          tile.style.backgroundColor = hex;
+          // Do not set any text content; we only display the colour.
+          tile.dataset.row = i;
+          tile.dataset.col = j;
+          tile.addEventListener('click', handleTileClick);
+          tile.addEventListener('touchstart', handleTileClick);
+          grid.appendChild(tile);
+        });
+      });
+    }
+
+    function handleTileClick(e) {
+      if (!selectedColor || movesLeft <= 0) return;
+      
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      const targetLetter = currentGrid[row][col];
+      
+      // If the tile is already of the selected colour, do nothing.
+      if (targetLetter === selectedColor) return;
+
+      const tilesToChange = getConnectedTiles(row, col, targetLetter);
+      
+      if (tilesToChange.length > 0) {
+        tilesToChange.forEach(([r, c]) => {
+          currentGrid[r][c] = selectedColor;
+          const hex = letterToHex(selectedColor);
+          const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+          tile.style.backgroundColor = hex;
+          // No text update since we don't display letters.
+        });
+        
+        movesLeft--;
+        document.getElementById('moves').textContent = `Moves left: ${movesLeft}`;
+        
+        if (checkWin()) {
+          setTimeout(() => alert('Bravo! You won!'), 100);
+        } else if (movesLeft === 0) {
+          setTimeout(() => alert('Nah! Try Again!'), 100);
+        }
+      }
+    }
+
+    function getConnectedTiles(startRow, startCol, targetLetter) {
+      const visited = new Set();
+      const queue = [[startRow, startCol]];
+      const connected = [];
+      
+      while (queue.length > 0) {
+        const [r, c] = queue.shift();
+        const key = `${r},${c}`;
+        
+        if (visited.has(key)) continue;
+        if (currentGrid[r]?.[c] !== targetLetter) continue;
+        
+        visited.add(key);
+        connected.push([r, c]);
+        
+        [[r-1, c], [r+1, c], [r, c-1], [r, c+1]].forEach(([nr, nc]) => {
+          if (nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
+            queue.push([nr, nc]);
+          }
+        });
+      }
+      return connected;
+    }
+
+    function checkWin() {
+      const targetLetter = currentGrid[0][0];
+      return currentGrid.every(row => row.every(cell => cell === targetLetter));
+    }
+
+    function resetGame() {
+      currentGrid = JSON.parse(JSON.stringify(initialGrid));
+      movesLeft = 4;
+      document.getElementById('moves').textContent = `Moves left: ${movesLeft}`;
+      document.querySelectorAll('.tile').forEach((tile, i) => {
+        const row = Math.floor(i / initialGrid[0].length);
+        const col = i % initialGrid[0].length;
+        const letter = initialGrid[row][col];
+        const hex = letterToHex(letter);
+        tile.style.backgroundColor = hex;
+        // No text update needed.
+      });
+    }
+
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        // Convert the selected hex to its corresponding letter.
+        selectedColor = hexToLetter(btn.dataset.color);
+      });
+      
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        btn.click();
+      });
+    });
+
+    document.getElementById('reset').addEventListener('click', resetGame);
+    document.getElementById('reset').addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      resetGame();
+    });
+
+    resetGame();
+    createGrid();
+  </script>
+</body>
+</html>
