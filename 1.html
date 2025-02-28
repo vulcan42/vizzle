@@ -277,7 +277,7 @@
 <body>
   <h1>Paint it Red</h1>
   <div class="instructions">
-    <b>Objective</b>: Turn all tiles to <b>"Red"</b> 🟥 in <b>5</b> moves! Good Luck.
+    <b>Objective</b>: Turn all tiles to <b>"Red"</b> 🟥 in <b>4</b> moves! Good Luck.
   </div>
   
   <div class="how-to-play-dropdown">
@@ -330,22 +330,22 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "B", "G", "Y", "Y", "G", "B", "R"],
-        ["Y", "R", "R", "R", "R", "R", "R", "Y"],
-        ["Y", "Y", "B", "Y", "Y", "G", "Y", "Y"],
-        ["Y", "Y", "B", "Y", "Y", "G", "Y", "Y"],
-        ["G", "G", "B", "Y", "Y", "G", "B", "B"],
-        ["Y", "Y", "B", "Y", "Y", "G", "Y", "Y"],
-        ["Y", "Y", "B", "Y", "Y", "G", "Y", "Y"],
-        ["G", "G", "B", "Y", "Y", "G", "B", "B"],
-        ["Y", "Y", "B", "Y", "Y", "G", "Y", "Y"],
-        ["Y", "Y", "B", "G", "B", "G", "Y", "Y"]
+        ["G", "G", "G", "G", "G", "G", "Y", "Y"],
+        ["B", "B", "B", "B", "B", "B", "Y", "G"],
+        ["B", "R", "R", "R", "R", "R", "Y", "G"],
+        ["B", "R", "R", "R", "Y", "Y", "Y", "G"],
+        ["B", "R", "R", "G", "Y", "B", "B", "G"],
+        ["B", "R", "R", "Y", "R", "B", "B", "G"],
+        ["B", "Y", "Y", "Y", "B", "B", "B", "G"],
+        ["B", "Y", "B", "B", "B", "B", "B", "G"],
+        ["B", "Y", "G", "G", "G", "G", "G", "G"],
+        ["Y", "Y", "R", "R", "R", "R", "R", "R"]
       ],
-      allowedMoves: 5,
+      allowedMoves: 4,
       targetColor: "R",
       // New pagination config – control both page and modal links
       pagination: {
-        currentPage: 9,         /* Set current file number (e.g., 1, 2, 3, …) */
+        currentPage: 1,         /* Set current file number (e.g., 1, 2, 3, …) */
         maxPage: 9,             /* Maximum puzzle page number */
         showPrev: true,         /* Whether to show Previous link */
         showNext: true,         /* Whether to show Next link */

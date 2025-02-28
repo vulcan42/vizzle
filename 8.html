@@ -12,6 +12,7 @@
       -ms-user-select: none;
       user-select: none;
       cursor: default;
+      box-sizing: border-box;
     }
     body {
       margin: 0;
@@ -80,7 +81,7 @@
       padding: 2px;
       border: 2px solid white;
       border-radius: 5px;
-      margin: 8px 0;
+      margin: 8px auto;
       touch-action: none;
       grid-template-columns: repeat(8, 1fr);
       width: 90%;
@@ -99,11 +100,14 @@
       font-size: 1em;
       border: 1px solid white;
       border-radius: 4px;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      -webkit-tap-highlight-color: transparent; /* Updated: Remove tap highlight */
+    }
+    /* Updated: Remove focus outline to avoid tile highlighting */
+    .tile:focus {
       outline: none;
     }
-    .tile, .color-btn, #undo, #reset, #toggle-arrow {
+    .tile, .color-btn, #undo, #toggle-arrow {
       cursor: pointer;
     }
     @keyframes pop {
@@ -114,12 +118,15 @@
     .pop {
       animation: pop 0.3s ease;
     }
+    /* Controls container */
     .controls {
+      width: 90%;
+      max-width: 480px;
+      margin: 8px auto;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      margin-top: 8px;
       padding: 8px 0;
     }
     #moves-container {
@@ -159,7 +166,32 @@
       transform: rotate(-90deg);
       color: #fff;
     }
-    #reset {
+    /* PAGE PAGINATION (Controlled via CONFIG) */
+    .pagination {
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 0.95em;
+      width: 100%;
+    }
+    .pagination .prev, .pagination .next {
+      text-align: center;
+    }
+    .pagination a {
+      text-decoration: none;
+      color: #fff;
+      font-style: italic;
+      font-size: 0.95em;
+      padding: 5px;
+    }
+    .pagination a:hover {
+      opacity: 0.8;
+    }
+    .reset-container {
+      text-align: center;
+    }
+    .reset-container button#reset {
       background: #73A9D8;
       color: white;
       border: none;
@@ -167,23 +199,90 @@
       padding: 12px 24px;
       font-size: 1.1em;
       transition: opacity 0.2s;
-      margin-top: 8px;
     }
     @media (max-width: 600px) {
       .instructions, .how-to-play-dropdown {
         max-width: 90%;
       }
     }
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #d7f6f8;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+      /* Updated: Increased modal dimensions by 10% */
+      max-width: 99%;  /* was 90% */
+      max-height: 88%; /* was 80% */
+      position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 16px; /* Updated: Reduced size */
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .modal-message {
+      margin-top: 20px; /* Updated: Added margin to bring text down */
+      font-size: 1.2em; /* Updated: Reduced font size */
+      margin-bottom: 10px;
+    }
+    .modal-more-puzzles {
+      margin-top: 20px;
+    }
+    .modal-more-puzzles em {
+      display: block;
+      margin-bottom: 10px;
+    }
+    /* Modal Pagination (Icons only) */
+    .modal-pagination {
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      align-items: center;
+      width: 100%;
+    }
+    .modal-pagination .prev,
+    .modal-pagination .center,
+    .modal-pagination .next {
+      text-align: center;
+    }
+    .modal-pagination a {
+      text-decoration: none;
+      color: black;
+      font-style: italic;
+      font-size: 0.95em;
+      padding: 5px;
+    }
+    .modal-pagination a:hover {
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
   <h1>Paint it Red</h1>
   <div class="instructions">
-    <b>Objective</b>: Turn all tiles to <b>Red</b> 🟥 within <b>5</b> moves! Good Luck.
+    <b>Objective</b>: Turn all tiles to <b>"Red"</b> 🟥 in <b>5</b> moves! Good Luck.
   </div>
   
   <div class="how-to-play-dropdown">
-    <span class="how-to-play-header"><b>How to play</b></span><span id="toggle-arrow" class="toggle-arrow">▼</span>
+    <span class="how-to-play-header"><b>How to play</b></span>
+    <span id="toggle-arrow" class="toggle-arrow">▼</span>
     <div id="how-to-play-content" class="how-to-play-content">
       <p>
         1. Pick a color from the options below the grid (e.g. 🔴)<br>
@@ -207,26 +306,52 @@
       <button class="color-btn" style="background: #73A9D8" data-color="#73A9D8"></button>
       <button class="color-btn" style="background: #E3E846" data-color="#E3E846"></button>
     </div>
-    <button id="reset">Reset</button>
+    <!-- PAGE PAGINATION Container -->
+    <div id="page-pagination" class="pagination"></div>
+  </div>
+  
+  <!-- Modal Pop-up -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="modal-close">&times;</span>
+      <div id="modal-message" class="modal-message"></div>
+      <div id="modal-more-puzzles" class="modal-more-puzzles" style="display: none;">
+        <em>More puzzles</em>
+        <div class="modal-pagination">
+          <div class="prev" id="modal-prev"></div>
+          <div class="center" id="modal-center"></div>
+          <div class="next" id="modal-next"></div>
+        </div>
+      </div>
+    </div>
   </div>
   
   <script>
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["B", "B", "B", "G", "Y", "Y", "Y", "B"], // Row 10 (top)
-        ["B", "R", "G", "G", "G", "R", "Y", "Y"], // Row 9
-        ["R", "Y", "R", "G", "R", "Y", "R", "Y"], // Row 8
-        ["R", "Y", "Y", "R", "Y", "Y", "R", "Y"], // Row 7
-        ["B", "B", "Y", "Y", "Y", "R", "Y", "Y"], // Row 6
-        ["Y", "B", "B", "Y", "R", "G", "Y", "Y"], // Row 5
-        ["Y", "B", "B", "R", "G", "G", "G", "Y"], // Row 4
-        ["Y", "G", "B", "B", "B", "R", "B", "Y"], // Row 3
-        ["Y", "G", "G", "G", "B", "B", "R", "Y"], // Row 2
-        ["Y", "Y", "Y", "Y", "Y", "R", "R", "Y"]  // Row 1 (bottom)
+        ["B", "B", "B", "G", "Y", "Y", "Y", "B"], 
+        ["B", "R", "G", "G", "G", "R", "Y", "Y"], 
+        ["R", "Y", "R", "G", "R", "Y", "R", "Y"], 
+        ["R", "Y", "Y", "R", "Y", "Y", "R", "Y"], 
+        ["B", "B", "Y", "Y", "Y", "R", "Y", "Y"], 
+        ["Y", "B", "B", "Y", "R", "G", "Y", "Y"], 
+        ["Y", "B", "B", "R", "G", "G", "G", "Y"], 
+        ["Y", "G", "B", "B", "B", "R", "B", "Y"], 
+        ["Y", "G", "G", "G", "B", "B", "R", "Y"], 
+        ["Y", "Y", "Y", "Y", "Y", "R", "R", "Y"]
       ],
       allowedMoves: 5,
-      targetColor: "R"
+      targetColor: "R",
+      // New pagination config – control both page and modal links
+      pagination: {
+        currentPage: 8,         /* Set current file number (e.g., 1, 2, 3, …) */
+        maxPage: 9,             /* Maximum puzzle page number */
+        showPrev: true,         /* Whether to show Previous link */
+        showNext: true,         /* Whether to show Next link */
+        prevText: "⏪<br><em>Previous</em>",  /* Text for previous link on page */
+        nextText: "⏩<br><em>Next</em>"         /* Text for next link on page */
+      }
     };
     
     function letterToHex(letter) {
@@ -302,9 +427,9 @@
         document.getElementById('moves').textContent = `Moves left: ${movesLeft}`;
         setTimeout(() => {
           if (checkWin()) {
-            alert('Bravo! You won!');
+            showModal('Bravo! You won!', true);
           } else if (movesLeft === 0) {
-            alert('Nah! Try Again!');
+            showModal('Nah! Try Again!', false);
           }
         }, maxDelay * 1000 + 300);
       }
@@ -361,6 +486,75 @@
       });
     }
     
+    // Function to update the page pagination using CONFIG values
+    function updatePagePagination() {
+      const pagePagination = document.getElementById("page-pagination");
+      const currentPage = CONFIG.pagination.currentPage;
+      let prevHTML = "";
+      let nextHTML = "";
+      if (CONFIG.pagination.showPrev && currentPage > 1) {
+        prevHTML = '<div class="prev"><a href="' + (currentPage - 1) + '.html" title="Previous Day">' + CONFIG.pagination.prevText + '</a></div>';
+      } else {
+        prevHTML = '<div class="prev"></div>';
+      }
+      if (CONFIG.pagination.showNext && currentPage < CONFIG.pagination.maxPage) {
+        nextHTML = '<div class="next"><a href="' + (currentPage + 1) + '.html" title="Next Day">' + CONFIG.pagination.nextText + '</a></div>';
+      } else {
+        nextHTML = '<div class="next"></div>';
+      }
+      const centerHTML = '<div class="reset-container"><button id="reset">Reset</button></div>';
+      pagePagination.innerHTML = prevHTML + centerHTML + nextHTML;
+      // Attach reset event listeners
+      document.getElementById("reset").addEventListener("click", resetGame);
+      document.getElementById("reset").addEventListener("touchstart", (e) => { e.preventDefault(); resetGame(); });
+    }
+    
+    // Function to update modal pagination (icons only) using CONFIG values
+    function updateModalPagination() {
+      const currentPage = CONFIG.pagination.currentPage;
+      let modalPrevHTML = "";
+      let modalNextHTML = "";
+      if (CONFIG.pagination.showPrev && currentPage > 1) {
+        modalPrevHTML = '<a href="' + (currentPage - 1) + '.html" title="Previous Day">⏪</a>';
+      }
+      if (CONFIG.pagination.showNext && currentPage < CONFIG.pagination.maxPage) {
+        modalNextHTML = '<a href="' + (currentPage + 1) + '.html" title="Next Day">⏩</a>';
+      }
+      document.getElementById("modal-prev").innerHTML = modalPrevHTML;
+      document.getElementById("modal-center").innerHTML = ""; // No center content needed
+      document.getElementById("modal-next").innerHTML = modalNextHTML;
+    }
+    
+    // Modal functions
+    function showModal(message, isWin) {
+      var modal = document.getElementById('modal');
+      var modalMessage = document.getElementById('modal-message');
+      modalMessage.textContent = message;
+      var modalMorePuzzles = document.getElementById('modal-more-puzzles');
+      
+      if (isWin) {
+        modalMorePuzzles.style.display = 'block';
+        updateModalPagination();
+      } else {
+        modalMorePuzzles.style.display = 'none';
+      }
+      
+      modal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+      var modal = document.getElementById('modal');
+      modal.style.display = 'none';
+    }
+    
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    window.addEventListener('click', function(event) {
+      var modal = document.getElementById('modal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    });
+    
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
@@ -371,12 +565,6 @@
         e.preventDefault();
         btn.click();
       });
-    });
-    
-    document.getElementById('reset').addEventListener('click', resetGame);
-    document.getElementById('reset').addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      resetGame();
     });
     
     document.getElementById('undo').addEventListener('click', undoMove);
@@ -392,8 +580,10 @@
       }
     });
     
+    // Initialize the game and pagination
     resetGame();
     createGrid();
+    updatePagePagination();
   </script>
 </body>
 </html>
