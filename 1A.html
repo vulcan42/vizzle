@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Paint it Free</title>
+  <style>
+    /* Global Styles */
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      cursor: default;
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 10px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #36454F;
+      font-family: Arial, sans-serif;
+      touch-action: manipulation;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #73A9D8;
+      margin: 10px 0 5px 0;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    /* Objectives Dropdown (Reduced font size with added margin) */
+    .objectives-dropdown {
+      width: 100%;
+      max-width: 480px;
+      margin: 10px 10px;
+      color: #fff;
+      font-size: 0.9em;
+    }
+    #objectives-header h2 {
+      margin: 0;
+      font-size: 1.1em;
+      padding: 5px 0px 5px 20px;
+    }
+    #objectives-header {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .toggle-arrow { 
+      font-size: 1em; 
+      margin-left: 5px;
+    }
+    #objectives-content {
+      display: none;
+      margin-top: 5px;
+    }
+    #objectives-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #objectives-content li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      padding-left: 30px;
+      max-width: 360px;
+    }
+    .star {
+      font-size: 1.2em;
+      transition: transform 0.3s ease;
+      color: #fff;
+    }
+    .star.achieved {
+      color: gold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+    /* How To Play Dropdown – Updated for horizontal alignment */
+    .how-to-play-dropdown {
+      width: 100%;
+      max-width: 480px;
+      margin: 10px 10px 15px;
+      color: #fff;
+      font-size: 0.95em;
+      text-align: left;
+    }
+    .how-to-play-header {
+      color: #fff;
+      text-align: left;
+      margin: 0 0 8px 20px; /* Left margin to align with objectives */
+      line-height: 1.4;
+      font-size: 0.95em;
+      width: 100%;
+      max-width: 480px;
+    }
+    .how-to-play-content {
+      display: none;
+      margin-top: 4px;
+      padding-left: 20px; /* Align with header */
+      border-left: 2px solid #fff;
+    }
+    /* Your Score Section (shows three blank stars initially) */
+    #score-section {
+      text-align: center;
+      margin: 10px 0;
+      color: #fff;
+      font-size: 1.2em;
+    }
+    #score {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    /* Grid Styles */
+    .grid {
+      position: relative;
+      display: grid;
+      gap: 0;
+      padding: 2px;
+      border: 2px solid white;
+      border-radius: 5px;
+      margin: 8px auto;
+      touch-action: none;
+      grid-template-columns: repeat(8, 1fr);
+      width: 90%;
+      max-width: 480px;
+      background: url('images/bg.png') no-repeat center center;
+      background-size: cover;
+    }
+    .tile {
+      width: 100%;
+      aspect-ratio: 1/1;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1em;
+      border: 1px solid white;
+      border-radius: 4px;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tile:focus { outline: none; }
+    .tile, .color-btn, #undo { cursor: pointer; }
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .pop { animation: pop 0.3s ease; }
+    /* Moves Made & Undo (Undo text now white) */
+    #moves-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 1.3em;
+      margin: 10px 0;
+    }
+    #undo {
+      background: transparent;
+      border: 1px solid #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 13px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-90deg);
+      color: #fff;
+    }
+    /* Color Picker */
+    .color-picker {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .color-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      transition: transform 0.1s;
+    }
+    .color-btn.selected {
+      transform: scale(1.2);
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+    /* More Puzzles Section (Pagination & Reset Button) – Reverted to original from 11.html */
+    #page-pagination {
+      width: 100%;
+      max-width: 480px;
+      margin: 10px auto;
+      text-align: center;
+      font-size: 0.95em;
+      color: #fff;
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      align-items: center;
+    }
+    .prev, .next, .reset-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #page-pagination a {
+      text-decoration: none;
+      color: #fff;
+      font-style: italic;
+      padding: 5px;
+    }
+    #page-pagination a:hover { opacity: 0.8; }
+    .reset-container button#reset {
+      background: #73A9D8;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 24px;
+      font-size: 1.1em;
+      transition: opacity 0.2s;
+    }
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #d7f6f8;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 99%;
+      max-height: 88%;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .modal-message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .modal-more-puzzles {
+      margin-top: 20px;
+    }
+    .modal-more-puzzles em {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .modal-pagination {
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      align-items: center;
+      width: 100%;
+    }
+    .modal-pagination a {
+      text-decoration: none;
+      color: black;
+      font-style: italic;
+      padding: 5px;
+    }
+    .modal-pagination a:hover { opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <!-- Title -->
+  <h1>Paint it Free</h1>
+  
+  <!-- Objectives Dropdown -->
+  <div id="objectives-dropdown" class="objectives-dropdown">
+    <div id="objectives-header">
+      <h2>Objectives</h2>
+      <span id="objectives-toggle" class="toggle-arrow">▼</span>
+    </div>
+    <div id="objectives-content">
+      <ul>
+        <li data-index="0">Turn all tiles to to Blue 🟦 in 5 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Red 🟥 in 6 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Yellow 🟨 in 7 moves <span class="star" id="star-2">☆</span></li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- How To Play Section -->
+  <div class="how-to-play-dropdown">
+    <span class="how-to-play-header"><b>How to play</b></span>
+    <span id="toggle-arrow" class="toggle-arrow">▼</span>
+    <div id="how-to-play-content" class="how-to-play-content">
+      <p>
+        1. Pick a color from the options below the grid (e.g. 🔴)<br>
+        2. Click on a color tile (e.g. 🟦) in grid to change to selected colour (🟦→🟥)<br>
+        3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br>
+        <br>Give it a try!
+      </p>
+    </div>
+  </div>
+  
+  <!-- Your Score Section (initially shows three blank stars) -->
+  <div id="score-section">
+    Your Score: <span id="score"></span>
+  </div>
+  
+  <!-- Grid -->
+  <div id="grid" class="grid"></div>
+  
+  <!-- Moves Made & Undo -->
+  <div id="moves-container">
+    <div id="moves">Moves made: 0</div>
+    <button id="undo" title="Undo last move">↺</button>
+  </div>
+  
+  <!-- Color Picker -->
+  <div class="color-picker">
+    <button class="color-btn" style="background: #E36E5D" data-color="#E36E5D"></button>
+    <button class="color-btn" style="background: #5CA587" data-color="#5CA587"></button>
+    <button class="color-btn" style="background: #73A9D8" data-color="#73A9D8"></button>
+    <button class="color-btn" style="background: #E3E846" data-color="#E3E846"></button>
+  </div>
+  
+  <!-- More Puzzles Section (Pagination & Reset) -->
+  <div id="page-pagination" class="pagination"></div>
+  
+  <!-- Modal Pop-up -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="modal-close">&times;</span>
+      <div id="modal-header" class="modal-message"></div>
+      <div id="modal-objectives"></div>
+      <div id="modal-more-puzzles" class="modal-more-puzzles" style="display: none;">
+        <em>More puzzles</em>
+        <div class="modal-pagination">
+          <div class="prev" id="modal-prev"></div>
+          <div class="center" id="modal-center"></div>
+          <div class="next" id="modal-next"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // ================= CONFIG SECTION =================
+    const CONFIG = {
+      initialGrid: [
+        ["Y", "Y", "Y", "B", "B", "G", "R", "R"],
+        ["Y", "Y", "B", "G", "R", "R", "R", "G"],
+        ["Y", "Y", "B", "Y", "Y", "G", "B", "G"],
+        ["Y", "Y", "G", "R", "Y", "G", "R", "B"],
+        ["Y", "Y", "G", "R", "Y", "Y", "Y", "R"],
+        ["Y", "Y", "G", "G", "B", "G", "Y", "G"],
+        ["G", "G", "Y", "Y", "Y", "B", "Y", "G"],
+        ["G", "R", "Y", "Y", "Y", "B", "Y", "G"],
+        ["R", "R", "B", "B", "R", "G", "Y", "Y"],
+        ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"]
+      ],
+      maxMoves: 7,
+      winConditions: [
+        { color: "B", moves: 5, description: "Turn all tiles to Blue 🟦 in 5 moves" },
+        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 in 6 moves" },
+        { color: "Y", moves: 7, description: "Turn all tiles to Yellow 🟨 in 7 moves" }
+      ],
+      pagination: {
+        currentPage: 12,
+        maxPage: 12,
+        showPrev: true,
+        showNext: true,
+        prevText: "⏪<br><em>Previous</em>",
+        nextText: "⏩<br><em>Next</em>"
+      }
+    };
+    
+    // Flag to ensure auto-win modal only shows once.
+    let autoWinModalShown = false;
+    
+    // ================= UTILITY FUNCTIONS =================
+    function letterToHex(letter) {
+      if(letter === "R") return "rgba(227,110,93,0.8)";
+      if(letter === "G") return "rgba(92,165,135,0.8)";
+      if(letter === "B") return "rgba(115,169,216,0.8)";
+      if(letter === "Y") return "rgba(227,232,70,0.8)";
+      return "";
+    }
+    function hexToLetter(hex) {
+      if(hex === "#E36E5D") return "R";
+      if(hex === "#5CA587") return "G";
+      if(hex === "#73A9D8") return "B";
+      if(hex === "#E3E846") return "Y";
+      return "";
+    }
+    
+    // ================= GAME STATE =================
+    let currentGrid;
+    let selectedColor = null;
+    let movesMade = 0;
+    let history = [];
+    // starsAchieved holds achievement status for each win condition (persists across resets)
+    let starsAchieved = [false, false, false];
+    
+    // ================= GRID CREATION =================
+    function createGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      grid.style.gridTemplateColumns = `repeat(${CONFIG.initialGrid[0].length}, 1fr)`;
+      CONFIG.initialGrid.forEach((row, i) => {
+        row.forEach((letter, j) => {
+          const hex = letterToHex(letter);
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          tile.style.backgroundColor = hex;
+          tile.dataset.row = i;
+          tile.dataset.col = j;
+          tile.addEventListener('click', handleTileClick);
+          tile.addEventListener('touchstart', handleTileClick);
+          grid.appendChild(tile);
+        });
+      });
+      currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
+    }
+    
+    // ================= MOVE HANDLING =================
+    function handleTileClick(e) {
+      if (!selectedColor || movesMade >= CONFIG.maxMoves) return;
+      
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      const targetLetter = currentGrid[row][col];
+      if (targetLetter === selectedColor) return;
+      
+      history.push({
+        grid: JSON.parse(JSON.stringify(currentGrid)),
+        moves: movesMade
+      });
+      
+      const tilesToChange = getConnectedTiles(row, col, targetLetter);
+      let maxDelay = 0;
+      if (tilesToChange.length > 0) {
+        tilesToChange.forEach(([r, c]) => {
+          const distance = Math.abs(r - row) + Math.abs(c - col);
+          const delay = distance * 0.05;
+          if (delay > maxDelay) maxDelay = delay;
+          const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+          tile.style.transitionDelay = `${delay}s`;
+          setTimeout(() => {
+            tile.classList.add("pop");
+            setTimeout(() => tile.classList.remove("pop"), 300);
+          }, delay * 1000);
+          currentGrid[r][c] = selectedColor;
+          tile.style.backgroundColor = letterToHex(selectedColor);
+        });
+        movesMade++;
+        document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+        updateStars();
+        updateScoreDisplay();
+        setTimeout(() => {
+          if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
+            showModal("Nah! Try Again!", false);
+          } else if (starsAchieved.filter(s => s).length === 3 && !autoWinModalShown) {
+            showModal("Bravo! You got it!", true);
+            autoWinModalShown = true;
+          }
+        }, maxDelay * 1000 + 300);
+      }
+    }
+    
+    function getConnectedTiles(startRow, startCol, targetLetter) {
+      const visited = new Set();
+      const queue = [[startRow, startCol]];
+      const connected = [];
+      while (queue.length > 0) {
+        const [r, c] = queue.shift();
+        const key = `${r},${c}`;
+        if (visited.has(key)) continue;
+        if (currentGrid[r]?.[c] !== targetLetter) continue;
+        visited.add(key);
+        connected.push([r, c]);
+        [[r-1, c], [r+1, c], [r, c-1], [r, c+1]].forEach(([nr, nc]) => {
+          if (nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
+            queue.push([nr, nc]);
+          }
+        });
+      }
+      return connected;
+    }
+    
+    // ================= STAR & SCORE UPDATES =================
+    function updateStars() {
+      CONFIG.winConditions.forEach((condition, index) => {
+        if (!starsAchieved[index] && movesMade <= condition.moves) {
+          if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
+            starsAchieved[index] = true;
+            const starElem = document.getElementById(`star-${index}`);
+            starElem.classList.add("achieved");
+            starElem.textContent = "★";
+            starElem.style.transform = "scale(1.5)";
+            setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
+          }
+        }
+      });
+    }
+    
+    function updateScoreDisplay() {
+      let achievedCount = starsAchieved.filter(s => s).length;
+      let displayCount = 0;
+      if (achievedCount > 0) {
+        if (starsAchieved[0]) displayCount = achievedCount;
+        else displayCount = 1;
+      }
+      let scoreHTML = "";
+      for (let i = 0; i < 3; i++) {
+        if (i < displayCount) {
+          scoreHTML += '<span class="star achieved" style="font-size:1.4em; margin:0 2px;">★</span>';
+        } else {
+          scoreHTML += '<span class="star" style="font-size:1.4em; margin:0 2px;">☆</span>';
+        }
+      }
+      document.getElementById('score').innerHTML = scoreHTML;
+    }
+    
+    // ================= RESET & UNDO =================
+    function resetGame() {
+      currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
+      movesMade = 0;
+      history = [];
+      document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      createGrid();
+    }
+    
+    function undoMove() {
+      if (history.length === 0) return;
+      const lastState = history.pop();
+      currentGrid = lastState.grid;
+      movesMade = lastState.moves;
+      document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      updateScoreDisplay();
+      document.querySelectorAll('.tile').forEach((tile, i) => {
+        const row = Math.floor(i / CONFIG.initialGrid[0].length);
+        const col = i % CONFIG.initialGrid[0].length;
+        const letter = currentGrid[row][col];
+        tile.style.backgroundColor = letterToHex(letter);
+      });
+    }
+    
+    // ================= MODAL HANDLING =================
+    function showModal(message, isWin) {
+      const modal = document.getElementById('modal');
+      const modalHeader = document.getElementById('modal-header');
+      const modalObjectives = document.getElementById('modal-objectives');
+      
+      modalHeader.textContent = message;
+      let objectivesHTML = '<h3>Objectives</h3><ul style="list-style:none; padding:0;">';
+      CONFIG.winConditions.forEach((condition, index) => {
+        const starHTML = starsAchieved[index]
+          ? '<span style="color:gold; text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:1.2em;">★</span>'
+          : '<span style="color:#fff; font-size:1.2em;">☆</span>';
+        objectivesHTML += `<li style="margin-bottom:4px;">${condition.description} ${starHTML}</li>`;
+      });
+      objectivesHTML += '</ul>';
+      modalObjectives.innerHTML = objectivesHTML;
+      modal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+    
+    // ================= EVENT LISTENERS =================
+    document.getElementById('score').addEventListener('click', () => {
+      let achievedCount = starsAchieved.filter(s => s).length;
+      let displayCount = 0;
+      if (achievedCount > 0) {
+        if (starsAchieved[0]) displayCount = achievedCount;
+        else displayCount = 1;
+      }
+      showModal(`Your Stars: ${displayCount}/3`, displayCount === 3);
+    });
+    
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('modal');
+      if (event.target == modal) closeModal();
+    });
+    
+    document.getElementById('objectives-header').addEventListener('click', () => {
+      const content = document.getElementById('objectives-content');
+      const toggleArrow = document.getElementById('objectives-toggle');
+      if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        toggleArrow.textContent = '▲';
+      } else {
+        content.style.display = 'none';
+        toggleArrow.textContent = '▼';
+      }
+    });
+    
+    // How To Play Toggle
+    document.getElementById('toggle-arrow').addEventListener('click', () => {
+      const content = document.getElementById('how-to-play-content');
+      if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        document.getElementById('toggle-arrow').textContent = '▲';
+      } else {
+        content.style.display = 'none';
+        document.getElementById('toggle-arrow').textContent = '▼';
+      }
+    });
+    
+    // ================= PAGINATION (More Puzzles Section) =================
+    function updatePagePagination() {
+      const pagePagination = document.getElementById("page-pagination");
+      const currentPage = CONFIG.pagination.currentPage;
+      let prevHTML = "";
+      let nextHTML = "";
+      if (CONFIG.pagination.showPrev && currentPage > 1) {
+        prevHTML = '<div class="prev"><a href="' + (currentPage - 1) + '.html" title="Previous Day">' + CONFIG.pagination.prevText + '</a></div>';
+      } else {
+        prevHTML = '<div class="prev"></div>';
+      }
+      if (CONFIG.pagination.showNext && currentPage < CONFIG.pagination.maxPage) {
+        nextHTML = '<div class="next"><a href="' + (currentPage + 1) + '.html" title="Next Day">' + CONFIG.pagination.nextText + '</a></div>';
+      } else {
+        nextHTML = '<div class="next"></div>';
+      }
+      const centerHTML = '<div class="reset-container"><button id="reset">Reset</button></div>';
+      pagePagination.innerHTML = prevHTML + centerHTML + nextHTML;
+      document.getElementById("reset").addEventListener("click", resetGame);
+      document.getElementById("reset").addEventListener("touchstart", (e) => { e.preventDefault(); resetGame(); });
+    }
+    
+    function updateModalPagination() {
+      const currentPage = CONFIG.pagination.currentPage;
+      let modalPrevHTML = "";
+      let modalNextHTML = "";
+      if (CONFIG.pagination.showPrev && currentPage > 1) {
+        modalPrevHTML = '<a href="' + (currentPage - 1) + '.html" title="Previous Day">⏪</a>';
+      }
+      if (CONFIG.pagination.showNext && currentPage < CONFIG.pagination.maxPage) {
+        modalNextHTML = '<a href="' + (currentPage + 1) + '.html" title="Next Day">⏩</a>';
+      }
+      document.getElementById("modal-prev").innerHTML = modalPrevHTML;
+      document.getElementById("modal-center").innerHTML = "";
+      document.getElementById("modal-next").innerHTML = modalNextHTML;
+    }
+    
+    // ================= INITIALIZATION =================
+    resetGame();
+    createGrid();
+    updatePagePagination();
+    updateScoreDisplay();
+    
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedColor = hexToLetter(btn.dataset.color);
+      });
+      btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
+    });
+    
+    document.getElementById('undo').addEventListener('click', undoMove);
+  </script>
+</body>
+</html>
