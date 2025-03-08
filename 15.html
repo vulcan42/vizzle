@@ -304,9 +304,9 @@
     <p class="objectives-description">Turn all tiles to Red 🟥 in least number of moves</p>
     <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 in 5 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Red 🟥 in 6 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Red 🟥 in 7 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 in 6 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Red 🟥 in 7 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Red 🟥 in 8 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -371,25 +371,25 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "R", "R", "R", "R", "R", "R", "R"],
-        ["B", "Y", "B", "B", "B", "Y", "G", "R"],
-        ["Y", "Y", "B", "Y", "G", "Y", "Y", "R"],
-        ["G", "B", "B", "Y", "G", "G", "G", "R"],
-        ["G", "Y", "Y", "R", "Y", "Y", "G", "R"],
-        ["G", "G", "G", "Y", "B", "B", "G", "R"],
-        ["Y", "Y", "G", "Y", "B", "Y", "Y", "R"],
-        ["G", "Y", "B", "B", "B", "Y", "B", "R"],
-        ["R", "R", "R", "R", "R", "R", "R", "G"],
-        ["G", "Y", "Y", "B", "G", "G", "G", "G"]
+        ["B", "B", "R", "R", "R", "B", "B", "B"],
+        ["B", "B", "R", "G", "Y", "Y", "G", "B"],
+        ["R", "R", "R", "G", "Y", "Y", "G", "G"],
+        ["Y", "Y", "R", "G", "B", "B", "B", "G"],
+        ["Y", "B", "B", "G", "B", "Y", "Y", "B"],
+        ["Y", "B", "B", "R", "Y", "Y", "B", "B"],
+        ["G", "G", "R", "R", "G", "G", "B", "G"],
+        ["G", "B", "B", "R", "G", "G", "Y", "G"],
+        ["G", "Y", "B", "B", "R", "R", "Y", "G"],
+        ["Y", "Y", "Y", "R", "R", "Y", "Y", "G"]
       ],
-      maxMoves: 7,
+      maxMoves: 8,
       winConditions: [
-        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 in 5 moves" },
-        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 in 6 moves" },
-        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 in 7 moves" }
+        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 in 5 moves" },
+        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 in 6 moves" },
+        { color: "R", moves: 8, description: "Turn all tiles to Red 🟥 in 7 moves" }
       ],
       pagination: {
-        currentPage: 14,
+        currentPage: 15,
         maxPage: 15,
         showPrev: true,
         showNext: true,
