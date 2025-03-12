@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Paint it Red</title>
+  <title>Paint it Full</title>
   <style>
     /* Global Styles */
     * {
@@ -26,7 +26,7 @@
       min-height: 100vh;
     }
     h1 {
-      color: #E36E5D;
+      color: #73A9D8;
       margin: 10px 0 5px 0;
       font-size: 2.5em;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
@@ -293,7 +293,7 @@
 </head>
 <body>
   <!-- Title -->
-  <h1>Paint it Red</h1>
+  <h1>Paint it Full</h1>
   
   <!-- Objectives Dropdown -->
   <div id="objectives-dropdown" class="objectives-dropdown">
@@ -301,12 +301,12 @@
       <h2>Objectives</h2>
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
-    <p class="objectives-description">Turn all tiles to Red 🟥 in least number of moves</p>
+    <p class="objectives-description">Turn all tiles to a single color in least number of moves</p>
     <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 in 5 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Red 🟥 in 6 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Red 🟥 in 7 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Green 🟩 in 5 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -386,7 +386,7 @@
       winConditions: [
         { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 in 5 moves" },
         { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 in 6 moves" },
-        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 in 7 moves" }
+        { color: "G", moves: 5, description: "Turn all tiles to Green 🟩 in 5 moves" }
       ],
       pagination: {
         currentPage: 16,
