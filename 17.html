@@ -41,7 +41,7 @@
       font-size: 0.9em;
     }
     .objectives-description {
-      font-size: 0.92em;
+      font-size: 0.95em;
       color: #fff;
       margin: 5px 20px;
     }
@@ -58,6 +58,10 @@
     .toggle-arrow { 
       font-size: 1em; 
       margin-left: 5px;
+      color: #E3E846;
+    }
+    .toggle-arrow-text {
+      color: #E3E846;
     }
     #objectives-content {
       display: none;
@@ -152,12 +156,15 @@
     }
     .tile:focus { outline: none; }
     .tile, .color-btn, #undo { cursor: pointer; }
+    /* Pop Animation (for clicked tile) */
     @keyframes pop {
       0% { transform: scale(0.8); }
       50% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
-    .pop { animation: pop 0.3s ease; }
+    .pop {
+      animation: pop 0.3s ease;
+    }
     /* Moves Made & Undo (Undo text now white) */
     #moves-container {
       display: flex;
@@ -301,12 +308,14 @@
       <h2>Objectives</h2>
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
-    <p class="objectives-description">Turn all tiles to a single color in least number of moves</p>
-    <div id="objectives-content">
+    <p class="objectives-description">
+        Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
+      </p>
+          <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Green 🟩 in 5 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Red 🟥 within 7 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Green 🟩 within 6 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -336,7 +345,7 @@
   <!-- Moves Made & Undo -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <button id="undo" title="Undo last move">↺</button>
+    <!-- <button id="undo" title="Undo last move">↺</button> -->
   </div>
   
   <!-- Color Picker -->
@@ -367,29 +376,32 @@
     </div>
   </div>
   
+  <!-- Audio Element for Pop Sound -->
+  <audio id="popSound" src="sounds/pop.mp3"></audio>
+  
   <script>
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "Y", "G", "R", "Y", "G", "R", "R"],
-        ["B", "B", "B", "B", "B", "B", "Y", "Y"],
-        ["B", "B", "G", "G", "G", "G", "Y", "Y"],
-        ["R", "Y", "Y", "Y", "Y", "G", "R", "Y"],
-        ["R", "Y", "B", "B", "Y", "G", "R", "Y"],
-        ["R", "Y", "B", "R", "G", "G", "R", "Y"],
-        ["R", "Y", "B", "R", "R", "R", "R", "Y"],
-        ["R", "R", "B", "B", "B", "B", "G", "G"],
-        ["R", "R", "G", "G", "G", "G", "G", "G"],
-        ["Y", "Y", "R", "Y", "B", "R", "Y", "B"]
+        ["R", "B", "B", "B", "R", "G", "G", "G"],
+        ["R", "B", "G", "B", "R", "G", "B", "G"],
+        ["R", "B", "G", "B", "R", "G", "B", "G"],
+        ["R", "B", "B", "B", "R", "G", "G", "G"],
+        ["Y", "Y", "Y", "Y", "G", "Y", "Y", "Y"],
+        ["R", "G", "G", "G", "R", "B", "B", "B"],
+        ["R", "G", "B", "G", "R", "B", "G", "B"],
+        ["R", "G", "B", "G", "R", "B", "G", "B"],
+        ["R", "G", "G", "G", "R", "B", "B", "B"],
+        ["R", "Y", "Y", "Y", "B", "Y", "Y", "Y"]
       ],
       maxMoves: 7,
       winConditions: [
-        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 in 5 moves" },
-        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 in 6 moves" },
-        { color: "G", moves: 5, description: "Turn all tiles to Green 🟩 in 5 moves" }
+        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
+        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 within 7 moves" },
+        { color: "G", moves: 6, description: "Turn all tiles to Green 🟩 within 6 moves" }
       ],
       pagination: {
-        currentPage: 16,
+        currentPage: 17,
         maxPage: 17,
         showPrev: true,
         showNext: true,
@@ -415,6 +427,30 @@
       if(hex === "#73A9D8") return "B";
       if(hex === "#E3E846") return "Y";
       return "";
+    }
+    
+    // ================= NEW FUNCTION: BFS with Levels =================
+    // Returns an array of objects: {r, c, level}
+    function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
+      const visited = new Set();
+      const result = [];
+      const queue = [{ r: startRow, c: startCol, level: 0 }];
+      visited.add(`${startRow},${startCol}`);
+      while(queue.length > 0) {
+        const { r, c, level } = queue.shift();
+        result.push({ r, c, level });
+        const neighbors = [[r-1,c], [r+1,c], [r, c-1], [r, c+1]];
+        for (const [nr, nc] of neighbors) {
+          if(nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
+            const key = `${nr},${nc}`;
+            if (!visited.has(key) && currentGrid[nr][nc] === targetLetter) {
+              visited.add(key);
+              queue.push({ r: nr, c: nc, level: level + 1 });
+            }
+          }
+        }
+      }
+      return result;
     }
     
     // ================= GAME STATE =================
@@ -460,55 +496,53 @@
         moves: movesMade
       });
       
-      const tilesToChange = getConnectedTiles(row, col, targetLetter);
+      // Use the BFS function to get tiles with their BFS level (stage)
+      const tilesWithLevels = getConnectedTilesWithLevels(row, col, targetLetter);
+      // Group tiles by level
+      const groups = {};
+      tilesWithLevels.forEach(({r, c, level}) => {
+        if (!groups[level]) groups[level] = [];
+        groups[level].push({r, c});
+      });
+      
+      // For each stage, schedule animation & sound once
+      const delayFactor = 0.1;
       let maxDelay = 0;
-      if (tilesToChange.length > 0) {
-        tilesToChange.forEach(([r, c]) => {
-          const distance = Math.abs(r - row) + Math.abs(c - col);
-          const delay = distance * 0.05;
-          if (delay > maxDelay) maxDelay = delay;
-          const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-          tile.style.transitionDelay = `${delay}s`;
-          setTimeout(() => {
+      for (const level in groups) {
+        const delay = level * delayFactor;
+        if (delay > maxDelay) maxDelay = delay;
+        setTimeout(() => {
+          // For each tile in this stage, trigger the pop animation and update color
+          groups[level].forEach(({r, c}) => {
+            const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
             tile.classList.add("pop");
             setTimeout(() => tile.classList.remove("pop"), 300);
-          }, delay * 1000);
-          currentGrid[r][c] = selectedColor;
-          tile.style.backgroundColor = letterToHex(selectedColor);
-        });
-        movesMade++;
+            currentGrid[r][c] = selectedColor;
+            tile.style.backgroundColor = letterToHex(selectedColor);
+          });
+          // Play pop sound once for this stage with adjusted volume:
+          const baseVolume = 1.0;
+          const reductionFactor = 0.1;
+          const volume = Math.max(baseVolume - (level * reductionFactor), 0.1);
+          const sound = document.getElementById("popSound").cloneNode();
+          sound.volume = volume;
+          sound.currentTime = 0;
+          sound.play();
+        }, delay * 1000);
+      }
+      
+      movesMade++;
         document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+        setTimeout(() => {
         updateStars();
         updateScoreDisplay();
-        setTimeout(() => {
-          if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
+        if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
             showModal("Nah! Try Again!", false);
-          } else if (starsAchieved.filter(s => s).length === 3 && !autoWinModalShown) {
+        } else if (starsAchieved.filter(s => s).length === 3 && !autoWinModalShown) {
             showModal("Bravo! You won!", true);
             autoWinModalShown = true;
-          }
+        }
         }, maxDelay * 1000 + 300);
-      }
-    }
-    
-    function getConnectedTiles(startRow, startCol, targetLetter) {
-      const visited = new Set();
-      const queue = [[startRow, startCol]];
-      const connected = [];
-      while (queue.length > 0) {
-        const [r, c] = queue.shift();
-        const key = `${r},${c}`;
-        if (visited.has(key)) continue;
-        if (currentGrid[r]?.[c] !== targetLetter) continue;
-        visited.add(key);
-        connected.push([r, c]);
-        [[r-1, c], [r+1, c], [r, c-1], [r, c+1]].forEach(([nr, nc]) => {
-          if (nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
-            queue.push([nr, nc]);
-          }
-        });
-      }
-      return connected;
     }
     
     // ================= STAR & SCORE UPDATES =================
@@ -596,12 +630,7 @@
     // ================= EVENT LISTENERS =================
     document.getElementById('score').addEventListener('click', () => {
       let achievedCount = starsAchieved.filter(s => s).length;
-      let displayCount = 0;
-      if (achievedCount > 0) {
-        if (starsAchieved[0]) displayCount = achievedCount;
-        else displayCount = 1;
-      }
-      showModal(`Your Stars: ${displayCount}/3`, displayCount === 3);
+      showModal(`Your Stars: ${achievedCount}/3`, achievedCount === 3);
     });
     
     document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -686,7 +715,7 @@
       btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
     });
     
-    document.getElementById('undo').addEventListener('click', undoMove);
+    // document.getElementById('undo').addEventListener('click', undoMove);
   </script>
 </body>
 </html>
