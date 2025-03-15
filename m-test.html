@@ -143,6 +143,8 @@
       width: 100%;
       aspect-ratio: 1/1;
       transition: background-color 0.3s ease, transform 0.3s ease;
+      /* Hint for GPU acceleration */
+      will-change: transform, background-color;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -362,8 +364,7 @@
     </div>
   </div>
   
-  <!-- Web Audio API: The audio element is no longer needed -->
-  
+  <!-- Web Audio API Setup (no traditional audio element needed) -->
   <script>
     // ================= CONFIG SECTION =================
     const CONFIG = {
@@ -408,7 +409,7 @@
       .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
       .then(decodedData => {
         popBuffer = decodedData;
-        console.log('Audio loaded and decoded');
+        console.log('Audio loaded and decoded, sample rate:', audioContext.sampleRate);
       })
       .catch(e => console.error('Error loading audio file:', e));
     
@@ -420,8 +421,13 @@
       }
       const source = audioContext.createBufferSource();
       source.buffer = popBuffer;
+      source.playbackRate.value = 1.0; // Ensure normal playback rate (no pitch shift)
+      
       const gainNode = audioContext.createGain();
+      // Optionally, use a ramp for smooth gain change:
+      // gainNode.gain.setTargetAtTime(volume, audioContext.currentTime, 0.01);
       gainNode.gain.value = volume;
+      
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
       source.start(0);
@@ -545,7 +551,6 @@
             const baseVolume = 1.0;
             const reductionFactor = 0.1;
             const volume = Math.max(baseVolume - (animation.level * reductionFactor), 0.1);
-            // Use Web Audio API function to play sound
             playPopSound(volume);
             animation.played = true;
           }
@@ -733,7 +738,7 @@
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedColor = hexToLetter(btn.dataset.color);
-        // Unlock the audio context on iOS if necessary:
+        // Unlock the AudioContext on iOS if necessary:
         if (audioContext.state === 'suspended') {
           audioContext.resume();
         }
