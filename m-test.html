@@ -32,7 +32,7 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       text-align: center;
     }
-    /* Objectives Dropdown (Reduced font size with added margin) */
+    /* Objectives Dropdown */
     .objectives-dropdown {
       width: 100%;
       max-width: 480px;
@@ -89,7 +89,7 @@
       color: gold;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
-    /* How To Play Dropdown – Updated for horizontal alignment */
+    /* How To Play Dropdown */
     .how-to-play-dropdown {
       width: 100%;
       max-width: 480px;
@@ -101,7 +101,7 @@
     .how-to-play-header {
       color: #fff;
       text-align: left;
-      margin: 0 0 8px 20px; /* Left margin to align with objectives */
+      margin: 0 0 8px 20px;
       line-height: 1.4;
       font-size: 0.95em;
       width: 100%;
@@ -110,17 +110,16 @@
     .how-to-play-content {
       display: none;
       margin-top: 4px;
-      padding-left: 20px; /* Align with header */
+      padding-left: 20px;
       border-left: 2px solid #fff;
     }
-    /* Your Score Section (shows three blank stars initially) */
+    /* Score Section */
     #score-section {
       text-align: center;
       margin: 10px 0;
       color: #fff;
       font-size: 1.2em;
     }
-    /* Removed underline from score */
     #score {
       cursor: pointer;
     }
@@ -155,8 +154,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     .tile:focus { outline: none; }
-    .tile, .color-btn, #undo { cursor: pointer; }
-    /* Pop Animation (for clicked tile) */
+    .tile, .color-btn { cursor: pointer; }
+    /* Pop Animation */
     @keyframes pop {
       0% { transform: scale(0.8); }
       50% { transform: scale(1.2); }
@@ -165,7 +164,7 @@
     .pop {
       animation: pop 0.3s ease;
     }
-    /* Moves Made & Undo (Undo text now white) */
+    /* Moves and Undo (undo button removed for testing) */
     #moves-container {
       display: flex;
       align-items: center;
@@ -173,19 +172,6 @@
       color: #fff;
       font-size: 1.3em;
       margin: 10px 0;
-    }
-    #undo {
-      background: transparent;
-      border: 1px solid #fff;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 13px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transform: rotate(-90deg);
-      color: #fff;
     }
     /* Color Picker */
     .color-picker {
@@ -204,7 +190,7 @@
       transform: scale(1.2);
       box-shadow: 0 0 8px rgba(255,255,255,0.5);
     }
-    /* More Puzzles Section (Pagination & Reset Button) – Reverted to original from 11.html */
+    /* More Puzzles Section */
     #page-pagination {
       width: 100%;
       max-width: 480px;
@@ -309,12 +295,12 @@
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
     <p class="objectives-description">
-        Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
-      </p>
+      Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
+    </p>
     <div id="objectives-content">
       <ul>
         <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Red 🟥 within 7 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
         <li data-index="2">Turn all tiles to Green 🟩 within 6 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
@@ -328,13 +314,13 @@
       <p>
         1. Pick a color from the options below the grid (e.g. 🔴)<br>
         2. Click on a color tile (e.g. 🟦) in grid to change to selected colour (🟦→🟥)<br>
-        3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br>
-        <br>Give it a try!
+        3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br><br>
+        Give it a try!
       </p>
     </div>
   </div>
   
-  <!-- Your Score Section (initially shows three blank stars) -->
+  <!-- Your Score Section -->
   <div id="score-section">
     Your Score: <span id="score"></span>
   </div>
@@ -342,12 +328,10 @@
   <!-- Grid -->
   <div id="grid" class="grid"></div>
   
-  <!-- Moves Made & Undo -->
+  <!-- Moves Made (Undo button removed for testing) -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <!-- Undo button removed for testing
-    <button id="undo" title="Undo last move">↺</button>
-    -->
+    <!-- Undo button removed -->
   </div>
   
   <!-- Color Picker -->
@@ -378,28 +362,27 @@
     </div>
   </div>
   
-  <!-- Audio Element for Pop Sound -->
-  <audio id="popSound" src="sounds/pop.mp3"></audio>
+  <!-- Web Audio API: The audio element is no longer needed -->
   
   <script>
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "B", "B", "B", "R", "G", "G", "G"],
-        ["R", "B", "G", "B", "R", "G", "B", "G"],
-        ["R", "B", "G", "B", "R", "G", "B", "G"],
-        ["R", "B", "B", "B", "R", "G", "G", "G"],
-        ["Y", "Y", "Y", "Y", "G", "Y", "Y", "Y"],
-        ["R", "G", "G", "G", "R", "B", "B", "B"],
-        ["R", "G", "B", "G", "R", "B", "G", "B"],
-        ["R", "G", "B", "G", "R", "B", "G", "B"],
-        ["R", "G", "G", "G", "R", "B", "B", "B"],
-        ["R", "Y", "Y", "Y", "B", "Y", "Y", "Y"]
+        ["B", "R", "B", "R", "B", "R", "R", "R"],
+        ["R", "G", "B", "G", "R", "R", "R", "R"],
+        ["B", "B", "B", "B", "B", "R", "R", "R"],
+        ["R", "G", "B", "G", "R", "R", "R", "R"],
+        ["B", "Y", "B", "Y", "B", "R", "R", "R"],
+        ["Y", "Y", "Y", "G", "R", "G", "R", "G"],
+        ["Y", "Y", "Y", "Y", "B", "G", "B", "Y"],
+        ["Y", "Y", "Y", "G", "G", "G", "G", "G"],
+        ["Y", "Y", "Y", "Y", "B", "G", "B", "Y"],
+        ["Y", "Y", "Y", "G", "Y", "G", "Y", "G"]
       ],
       maxMoves: 7,
       winConditions: [
         { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
-        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 within 7 moves" },
+        { color: "R", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
         { color: "G", moves: 6, description: "Turn all tiles to Green 🟩 within 6 moves" }
       ],
       pagination: {
@@ -412,8 +395,37 @@
       }
     };
     
-    // Flag to ensure auto-win modal only shows once.
     let autoWinModalShown = false;
+    
+    // ================= WEB AUDIO API SETUP =================
+    // Create AudioContext (with vendor prefixes)
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let popBuffer = null;
+    
+    // Load and decode the MP3 file
+    fetch('sounds/pop.mp3')
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+      .then(decodedData => {
+        popBuffer = decodedData;
+        console.log('Audio loaded and decoded');
+      })
+      .catch(e => console.error('Error loading audio file:', e));
+    
+    // Function to play the pop sound at a given volume using Web Audio API
+    function playPopSound(volume = 1.0) {
+      if (!popBuffer) {
+        console.warn('Audio buffer not loaded yet.');
+        return;
+      }
+      const source = audioContext.createBufferSource();
+      source.buffer = popBuffer;
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = volume;
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      source.start(0);
+    }
     
     // ================= UTILITY FUNCTIONS =================
     function letterToHex(letter) {
@@ -431,7 +443,7 @@
       return "";
     }
     
-    // ================= NEW FUNCTION: BFS with Levels =================
+    // ================= BFS with Levels =================
     // Returns an array of objects: {r, c, level}
     function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
       const visited = new Set();
@@ -460,7 +472,6 @@
     let selectedColor = null;
     let movesMade = 0;
     let history = [];
-    // starsAchieved holds achievement status for each win condition (persists across resets)
     let starsAchieved = [false, false, false];
     
     // ================= GRID CREATION =================
@@ -498,21 +509,17 @@
         moves: movesMade
       });
       
-      // Get connected tiles with BFS levels
       const tilesWithLevels = getConnectedTilesWithLevels(row, col, targetLetter);
-      // Group tiles by level
       const groups = {};
       tilesWithLevels.forEach(({r, c, level}) => {
         if (!groups[level]) groups[level] = [];
         groups[level].push({r, c});
       });
       
-      // Increment move count and update display
       movesMade++;
       document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
       
-      // Create an array of pending animations for each group using requestAnimationFrame
-      const delayFactorMs = 400; // 0.1 seconds in milliseconds
+      const delayFactorMs = 300; // 0.1 sec per level
       const pendingAnimations = [];
       const startTime = performance.now();
       
@@ -525,11 +532,9 @@
         });
       }
       
-      // Animation loop function using requestAnimationFrame
       function animateGroups(currentTime) {
         pendingAnimations.forEach(animation => {
           if (!animation.played && currentTime >= animation.scheduledTime) {
-            // Animate each tile in the group
             animation.tiles.forEach(({r, c}) => {
               const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
               tile.classList.add("pop");
@@ -537,22 +542,17 @@
               currentGrid[r][c] = selectedColor;
               tile.style.backgroundColor = letterToHex(selectedColor);
             });
-            // Play pop sound once for this stage with adjusted volume:
             const baseVolume = 1.0;
             const reductionFactor = 0.1;
             const volume = Math.max(baseVolume - (animation.level * reductionFactor), 0.1);
-            const sound = document.getElementById("popSound").cloneNode();
-            sound.volume = volume;
-            sound.currentTime = 0;
-            sound.play();
+            // Use Web Audio API function to play sound
+            playPopSound(volume);
             animation.played = true;
           }
         });
-        // If there are still animations pending, request another frame
         if (pendingAnimations.some(animation => !animation.played)) {
           requestAnimationFrame(animateGroups);
         } else {
-          // Once all animations are complete, update stars and check win/failure
           updateStars();
           updateScoreDisplay();
           if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
@@ -564,7 +564,6 @@
         }
       }
       
-      // Start the animation loop
       requestAnimationFrame(animateGroups);
     }
     
@@ -686,7 +685,7 @@
       }
     });
     
-    // ================= PAGINATION (More Puzzles Section) =================
+    // ================= PAGINATION =================
     function updatePagePagination() {
       const pagePagination = document.getElementById("page-pagination");
       const currentPage = CONFIG.pagination.currentPage;
@@ -734,6 +733,10 @@
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedColor = hexToLetter(btn.dataset.color);
+        // Unlock the audio context on iOS if necessary:
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
       });
       btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
     });
