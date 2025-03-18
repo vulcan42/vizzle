@@ -175,6 +175,19 @@
       font-size: 1.3em;
       margin: 10px 0;
     }
+    #undo {
+      background: transparent;
+      border: 1px solid #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 13px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-90deg);
+      color: #fff;
+    }
     /* Color Picker */
     .color-picker {
       display: flex;
@@ -301,9 +314,9 @@
     </p>
     <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Red 🟥 within 7 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Green 🟩 within 6 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Red 🟥 within 7 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -333,7 +346,7 @@
   <!-- Moves Made (Undo button removed for testing) -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <!-- Undo button removed -->
+    <!-- <button id="undo" title="Undo last move">↺</button>  -->
   </div>
   
   <!-- Color Picker -->
@@ -369,25 +382,25 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "G", "B", "B", "G", "B", "B", "B"],
-        ["G", "B", "B", "B", "R", "B", "R", "R"],
-        ["B", "B", "B", "B", "R", "B", "R", "Y"],
-        ["B", "B", "G", "G", "G", "B", "R", "R"],
-        ["G", "R", "R", "Y", "Y", "B", "B", "B"],
-        ["B", "B", "B", "Y", "Y", "R", "R", "G"],
-        ["Y", "Y", "B", "G", "G", "G", "B", "B"],
-        ["G", "Y", "B", "R", "B", "B", "B", "B"],
-        ["Y", "Y", "B", "R", "B", "B", "B", "Y"],
-        ["B", "B", "B", "G", "B", "B", "Y", "R"]
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["R", "G", "B", "Y", "R", "Y", "B", "G"],
+        ["G", "B", "Y", "B", "B", "R", "Y", "B"],
+        ["B", "Y", "B", "B", "B", "B", "R", "Y"],
+        ["Y", "B", "B", "R", "Y", "B", "B", "R"],
+        ["R", "B", "B", "Y", "R", "B", "B", "Y"],
+        ["B", "R", "B", "B", "B", "B", "Y", "G"],
+        ["Y", "B", "R", "B", "B", "Y", "G", "B"],
+        ["G", "Y", "B", "R", "Y", "G", "B", "R"],
+        ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"]
       ],
       maxMoves: 8,
       winConditions: [
-        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
-        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 within 7 moves" },
-        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" }
+        { color: "G", moves: 6, description: "Turn all tiles to Green 🟩 within 6 moves" },
+        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 7 moves" },
+        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 within 7 moves" }
       ],
       pagination: {
-        currentPage: 19,
+        currentPage: 20,
         maxPage: 20,
         showPrev: true,
         showNext: true,
@@ -748,6 +761,11 @@
     
     // Undo event listener removed for testing
     // document.getElementById('undo').addEventListener('click', undoMove);
+    // document.getElementById('undo').addEventListener('touchstart', (e) => {
+    //  e.preventDefault();
+    // undoMove();
+    // });
+
   </script>
 </body>
 </html>
