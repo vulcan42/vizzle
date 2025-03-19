@@ -113,7 +113,7 @@
       padding-left: 20px;
       border-left: 2px solid #fff;
     }
-    /* Score Section */
+    /* Your Score Section */
     #score-section {
       text-align: center;
       margin: 10px 0;
@@ -156,7 +156,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .tile:focus { outline: none; }
-    .tile, .color-btn { cursor: pointer; }
+    .tile, .color-btn, #undo { cursor: pointer; }
     /* Pop Animation */
     @keyframes pop {
       0% { transform: scale(0.8); }
@@ -166,7 +166,14 @@
     .pop {
       animation: pop 0.3s ease;
     }
-    /* Moves and Undo (undo button removed for testing) */
+    /* Blocked Tiles (Walls) */
+    .tile.blocked {
+      background-color: rgba(128,128,128,0.8);
+      border: 2px solid #898d95;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
+    /* Moves and Undo */
     #moves-container {
       display: flex;
       align-items: center;
@@ -310,13 +317,13 @@
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
     <p class="objectives-description">
-      Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
-    </p>
-    <div id="objectives-content">
+        Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
+      </p>
+          <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Green 🟩 within 6 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Red 🟥 within 7 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Blue 🟦 within 5 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Green 🟩 within 4 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -329,7 +336,8 @@
       <p>
         1. Pick a color from the options below the grid (e.g. 🔴)<br>
         2. Click on a color tile (e.g. 🟦) in grid to change to selected colour (🟦→🟥)<br>
-        3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br><br>
+        3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br>
+        4. Tiles in Grey are blocked and cannot be painted over.<br>
         Give it a try!
       </p>
     </div>
@@ -343,10 +351,10 @@
   <!-- Grid -->
   <div id="grid" class="grid"></div>
   
-  <!-- Moves Made (Undo button removed for testing) -->
+  <!-- Moves Made & Undo -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <!-- <button id="undo" title="Undo last move">↺</button>  -->
+    <!-- <button id="undo" title="Undo last move">↺</button> -->
   </div>
   
   <!-- Color Picker -->
@@ -381,26 +389,27 @@
   <script>
     // ================= CONFIG SECTION =================
     const CONFIG = {
+      // Updated initialGrid with blocked tiles ("X") inserted.
       initialGrid: [
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["R", "G", "B", "Y", "R", "Y", "B", "G"],
-        ["G", "B", "Y", "B", "B", "R", "Y", "B"],
-        ["B", "Y", "B", "B", "B", "B", "R", "Y"],
-        ["Y", "B", "B", "R", "Y", "B", "B", "R"],
-        ["R", "B", "B", "Y", "R", "B", "B", "Y"],
-        ["B", "R", "B", "B", "B", "B", "Y", "G"],
-        ["Y", "B", "R", "B", "B", "Y", "G", "B"],
-        ["G", "Y", "B", "R", "Y", "G", "B", "R"],
-        ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"]
+        ["G", "G", "G", "G", "G", "G", "Y", "Y"],
+        ["B", "B", "B", "B", "B", "B", "Y", "G"],
+        ["B", "R", "R", "R", "R", "R", "Y", "G"],
+        ["B", "R", "R", "R", "Y", "Y", "X", "G"],
+        ["B", "R", "R", "G", "X", "B", "B", "G"],
+        ["B", "R", "R", "X", "R", "B", "B", "G"],
+        ["B", "X", "Y", "Y", "B", "B", "B", "G"],
+        ["B", "Y", "B", "B", "B", "B", "B", "G"],
+        ["B", "Y", "G", "G", "G", "G", "G", "G"],
+        ["Y", "Y", "R", "R", "R", "R", "R", "R"]
       ],
       maxMoves: 8,
       winConditions: [
-        { color: "G", moves: 6, description: "Turn all tiles to Green 🟩 within 6 moves" },
-        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
-        { color: "R", moves: 7, description: "Turn all tiles to Red 🟥 within 7 moves" }
+        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 within 5 moves" },
+        { color: "B", moves: 5, description: "Turn all tiles to Blue 🟦 within 5 moves" },
+        { color: "G", moves: 4, description: "Turn all tiles to Green 🟩 within 4 moves" }
       ],
       pagination: {
-        currentPage: 20,
+        currentPage: 21,
         maxPage: 21,
         showPrev: true,
         showNext: true,
@@ -452,6 +461,7 @@
       if(letter === "G") return "rgba(92,165,135,0.8)";
       if(letter === "B") return "rgba(115,169,216,0.8)";
       if(letter === "Y") return "rgba(227,232,70,0.8)";
+      if(letter === "X") return "rgba(161,166,179,0.8)"; // Blocked tile color
       return "";
     }
     function hexToLetter(hex) {
@@ -506,8 +516,13 @@
           tile.style.backgroundColor = hex;
           tile.dataset.row = i;
           tile.dataset.col = j;
-          tile.addEventListener('click', handleTileClick);
-          tile.addEventListener('touchstart', handleTileClick);
+          // If the tile is blocked, add the "blocked" class and skip event listeners
+          if (letter === "X") {
+            tile.classList.add("blocked");
+          } else {
+            tile.addEventListener('click', handleTileClick);
+            tile.addEventListener('touchstart', handleTileClick);
+          }
           grid.appendChild(tile);
         });
       });
@@ -588,8 +603,9 @@
     // ================= STAR & SCORE UPDATES =================
     function updateStars() {
       CONFIG.winConditions.forEach((condition, index) => {
+        // Ignore blocked tiles ("X") in the win condition check.
         if (!starsAchieved[index] && movesMade <= condition.moves) {
-          if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
+          if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
             starsAchieved[index] = true;
             const starElem = document.getElementById(`star-${index}`);
             starElem.classList.add("achieved");
@@ -759,13 +775,13 @@
       btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
     });
     
-    // Undo event listener removed for testing
+    // Undo event listener (commented-out sections preserved)
     // document.getElementById('undo').addEventListener('click', undoMove);
     // document.getElementById('undo').addEventListener('touchstart', (e) => {
-    //  e.preventDefault();
-    // undoMove();
+    //    e.preventDefault();
+    //    undoMove();
     // });
-
+    
   </script>
 </body>
 </html>
