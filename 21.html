@@ -168,7 +168,7 @@
     }
     /* Blocked Tiles (Walls) */
     .tile.blocked {
-      background-color: rgba(128,128,128,0.8);
+      background-color: rgba(161,166,179,0.8);
       border: 2px solid #898d95;
       box-shadow: 0 4px 8px rgba(0,0,0,0.6);
       transform: translateY(-2px);
@@ -419,6 +419,7 @@
     };
     
     let autoWinModalShown = false;
+    let isAnimating = false; // Global flag to block actions during animation
     
     // ================= WEB AUDIO API SETUP =================
     // Create AudioContext (with vendor prefixes)
@@ -531,7 +532,8 @@
     
     // ================= MOVE HANDLING =================
     function handleTileClick(e) {
-      if (!selectedColor || movesMade >= CONFIG.maxMoves) return;
+      // Only allow tile clicks if no animation is in progress.
+      if (!selectedColor || movesMade >= CONFIG.maxMoves || isAnimating) return;
       
       const row = parseInt(e.target.dataset.row);
       const col = parseInt(e.target.dataset.col);
@@ -552,6 +554,8 @@
       
       movesMade++;
       document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      
+      isAnimating = true;  // Begin animation: block all other actions.
       
       const delayFactorMs = 100; // 0.1 sec per level
       const pendingAnimations = [];
@@ -588,6 +592,8 @@
         } else {
           updateStars();
           updateScoreDisplay();
+          // End of animation - re-enable actions.
+          isAnimating = false;
           if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
             showModal("Nah! Try Again!", false);
           } else if (starsAchieved.filter(s => s).length === 3 && !autoWinModalShown) {
@@ -632,6 +638,8 @@
     
     // ================= RESET & UNDO =================
     function resetGame() {
+      // Do not allow reset while animation is in progress.
+      if(isAnimating) return;
       currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
       movesMade = 0;
       history = [];
