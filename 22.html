@@ -317,13 +317,13 @@
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
     <p class="objectives-description">
-        Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
+        Get All 3 Stars. Click on ☆ to see detailed objectives.
       </p>
           <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Blue 🟦 within 5 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Green 🟩 within 4 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Green 🟩 within 6 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -391,25 +391,25 @@
     const CONFIG = {
       // Updated initialGrid with blocked tiles ("X") inserted.
       initialGrid: [
-        ["G", "G", "G", "G", "G", "G", "Y", "Y"],
-        ["B", "B", "B", "B", "B", "B", "Y", "G"],
-        ["B", "R", "R", "R", "R", "R", "Y", "G"],
-        ["B", "R", "R", "R", "Y", "Y", "X", "G"],
-        ["B", "R", "R", "G", "X", "B", "B", "G"],
-        ["B", "R", "R", "X", "R", "B", "B", "G"],
-        ["B", "X", "Y", "Y", "B", "B", "B", "G"],
-        ["B", "Y", "B", "B", "B", "B", "B", "G"],
-        ["B", "Y", "G", "G", "G", "G", "G", "G"],
-        ["Y", "Y", "R", "R", "R", "R", "R", "R"]
+        ["Y", "R", "B", "G", "G", "G", "X", "G"],
+        ["X", "X", "X", "X", "G", "G", "X", "Y"],
+        ["G", "G", "G", "G", "G", "G", "X", "R"],
+        ["G", "G", "G", "G", "G", "G", "X", "G"],
+        ["G", "G", "G", "G", "R", "G", "G", "G"],
+        ["G", "G", "G", "B", "B", "B", "G", "G"],
+        ["G", "X", "G", "Y", "G", "Y", "G", "G"],
+        ["B", "X", "G", "G", "G", "G", "G", "G"],
+        ["G", "X", "G", "G", "X", "X", "X", "X"],
+        ["R", "X", "G", "G", "G", "R", "B", "Y"]
       ],
       maxMoves: 8,
       winConditions: [
-        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 within 5 moves" },
-        { color: "B", moves: 5, description: "Turn all tiles to Blue 🟦 within 5 moves" },
-        { color: "G", moves: 4, description: "Turn all tiles to Green 🟩 within 4 moves" }
+        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
+        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
+        { color: "G", moves: 6, description: "Turn all tiles to Green 🟩 within 6 moves" }
       ],
       pagination: {
-        currentPage: 21,
+        currentPage: 22,
         maxPage: 22,
         showPrev: true,
         showNext: true,
@@ -532,7 +532,7 @@
     
     // ================= MOVE HANDLING =================
     function handleTileClick(e) {
-      // Only allow tile clicks if no animation is in progress.
+      // Disallow any grid actions during animation.
       if (!selectedColor || movesMade >= CONFIG.maxMoves || isAnimating) return;
       
       const row = parseInt(e.target.dataset.row);
@@ -555,7 +555,8 @@
       movesMade++;
       document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
       
-      isAnimating = true;  // Begin animation: block all other actions.
+      // Begin animation: block all other actions.
+      isAnimating = true;
       
       const delayFactorMs = 100; // 0.1 sec per level
       const pendingAnimations = [];
@@ -638,7 +639,7 @@
     
     // ================= RESET & UNDO =================
     function resetGame() {
-      // Do not allow reset while animation is in progress.
+      // Disallow reset during animation.
       if(isAnimating) return;
       currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
       movesMade = 0;
@@ -772,6 +773,8 @@
     
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        // Disallow changing color during animation.
+        if(isAnimating) return;
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedColor = hexToLetter(btn.dataset.color);
