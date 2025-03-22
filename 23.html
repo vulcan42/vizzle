@@ -321,9 +321,9 @@
       </p>
           <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Green 🟩 within 6 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Yellow 🟨 within 5 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Green 🟩 within 5 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -359,10 +359,10 @@
   
   <!-- Color Picker -->
   <div class="color-picker">
-    <button class="color-btn" style="background: #E36E5D" data-color="#E36E5D"></button>
-    <button class="color-btn" style="background: #5CA587" data-color="#5CA587"></button>
-    <button class="color-btn" style="background: #73A9D8" data-color="#73A9D8"></button>
-    <button class="color-btn" style="background: #E3E846" data-color="#E3E846"></button>
+    <button class="color-btn" style="background: #E9625A" data-color="#E9625A"></button>
+    <button class="color-btn" style="background: #43A95D" data-color="#43A95D"></button>
+    <button class="color-btn" style="background: #4086D3" data-color="#4086D3"></button>
+    <button class="color-btn" style="background: #FDD538" data-color="#FDD538"></button>
   </div>
   
   <!-- More Puzzles Section (Pagination & Reset) -->
@@ -385,31 +385,29 @@
     </div>
   </div>
   
-  <!-- Web Audio API Setup (no traditional audio element needed) -->
   <script>
     // ================= CONFIG SECTION =================
     const CONFIG = {
-      // Updated initialGrid with blocked tiles ("X") inserted.
       initialGrid: [
-        ["Y", "R", "B", "G", "G", "G", "X", "G"],
-        ["X", "X", "X", "X", "G", "G", "X", "Y"],
-        ["G", "G", "G", "G", "G", "G", "X", "R"],
-        ["G", "G", "G", "G", "G", "G", "X", "G"],
-        ["G", "G", "G", "G", "R", "G", "G", "G"],
-        ["G", "G", "G", "B", "B", "B", "G", "G"],
-        ["G", "X", "G", "Y", "G", "Y", "G", "G"],
-        ["B", "X", "G", "G", "G", "G", "G", "G"],
-        ["G", "X", "G", "G", "X", "X", "X", "X"],
-        ["R", "X", "G", "G", "G", "R", "B", "Y"]
+        ["B", "B", "B", "B", "B", "B", "Y", "Y"],
+        ["G", "G", "G", "R", "R", "R", "R", "R"],
+        ["B", "B", "B", "Y", "B", "B", "B", "B"],
+        ["B", "B", "B", "Y", "B", "B", "B", "B"],
+        ["R", "R", "R", "Y", "G", "G", "G", "G"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "Y", "B", "B", "B", "B"],
+        ["B", "B", "B", "Y", "B", "B", "B", "B"],
+        ["R", "R", "R", "Y", "B", "G", "G", "G"],
+        ["Y", "B", "G", "B", "B", "Y", "B", "R"]
       ],
       maxMoves: 8,
       winConditions: [
-        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
-        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
-        { color: "G", moves: 6, description: "Turn all tiles to Green 🟩 within 6 moves" }
+        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 within 6 moves" },
+        { color: "Y", moves: 5, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
+        { color: "G", moves: 5, description: "Turn all tiles to Green 🟩 within 6 moves" }
       ],
       pagination: {
-        currentPage: 22,
+        currentPage: 23,
         maxPage: 23,
         showPrev: true,
         showNext: true,
@@ -458,18 +456,18 @@
     
     // ================= UTILITY FUNCTIONS =================
     function letterToHex(letter) {
-      if(letter === "R") return "rgba(227,110,93,0.8)";
-      if(letter === "G") return "rgba(92,165,135,0.8)";
-      if(letter === "B") return "rgba(115,169,216,0.8)";
-      if(letter === "Y") return "rgba(227,232,70,0.8)";
+      if(letter === "R") return "rgba(233,98,90,0.8)";
+      if(letter === "G") return "rgba(67,169,93,0.8)";
+      if(letter === "B") return "rgba(64,134,216,0.8)";
+      if(letter === "Y") return "rgba(253,213,56,0.8)";
       if(letter === "X") return "rgba(161,166,179,0.8)"; // Blocked tile color
       return "";
     }
     function hexToLetter(hex) {
-      if(hex === "#E36E5D") return "R";
-      if(hex === "#5CA587") return "G";
-      if(hex === "#73A9D8") return "B";
-      if(hex === "#E3E846") return "Y";
+      if(hex === "#E9625A") return "R";
+      if(hex === "#43A95D") return "G";
+      if(hex === "#4086D3") return "B";
+      if(hex === "#FDD538") return "Y";
       return "";
     }
     
