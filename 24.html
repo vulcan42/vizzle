@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Paint it Free</title>
+  <title>Paint it Full</title>
   <style>
     /* Global Styles */
     * {
@@ -32,13 +32,18 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       text-align: center;
     }
-    /* Objectives Dropdown (Reduced font size with added margin) */
+    /* Objectives Dropdown */
     .objectives-dropdown {
       width: 100%;
       max-width: 480px;
       margin: 10px 10px;
       color: #fff;
       font-size: 0.9em;
+    }
+    .objectives-description {
+      font-size: 0.95em;
+      color: #fff;
+      margin: 5px 20px;
     }
     #objectives-header h2 {
       margin: 0;
@@ -53,6 +58,10 @@
     .toggle-arrow { 
       font-size: 1em; 
       margin-left: 5px;
+      color: #E3E846;
+    }
+    .toggle-arrow-text {
+      color: #E3E846;
     }
     #objectives-content {
       display: none;
@@ -80,11 +89,11 @@
       color: gold;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
-    /* How To Play Dropdown – Updated for horizontal alignment */
+    /* How To Play Dropdown */
     .how-to-play-dropdown {
       width: 100%;
       max-width: 480px;
-      margin: 10px 10px 15px;
+      margin: 10px 10px 0px;
       color: #fff;
       font-size: 0.95em;
       text-align: left;
@@ -92,7 +101,7 @@
     .how-to-play-header {
       color: #fff;
       text-align: left;
-      margin: 0 0 8px 20px; /* Left margin to align with objectives */
+      margin: 0 0 8px 20px;
       line-height: 1.4;
       font-size: 0.95em;
       width: 100%;
@@ -101,10 +110,10 @@
     .how-to-play-content {
       display: none;
       margin-top: 4px;
-      padding-left: 20px; /* Align with header */
+      padding-left: 20px;
       border-left: 2px solid #fff;
     }
-    /* Your Score Section (shows three blank stars initially) */
+    /* Your Score Section */
     #score-section {
       text-align: center;
       margin: 10px 0;
@@ -112,7 +121,6 @@
       font-size: 1.2em;
     }
     #score {
-      text-decoration: underline;
       cursor: pointer;
     }
     /* Grid Styles */
@@ -134,7 +142,8 @@
     .tile {
       width: 100%;
       aspect-ratio: 1/1;
-      transition: background-color 0.3s ease, transform 0.3s ease;
+      transition: background 0.3s ease, transform 0.3s ease;
+      will-change: transform, background;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -147,13 +156,16 @@
     }
     .tile:focus { outline: none; }
     .tile, .color-btn, #undo { cursor: pointer; }
+    /* Pop Animation */
     @keyframes pop {
       0% { transform: scale(0.8); }
       50% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
-    .pop { animation: pop 0.3s ease; }
-    /* Moves Made & Undo (Undo text now white) */
+    .pop {
+      animation: pop 0.3s ease;
+    }
+    /* Moves Made & Undo */
     #moves-container {
       display: flex;
       align-items: center;
@@ -192,7 +204,7 @@
       transform: scale(1.2);
       box-shadow: 0 0 8px rgba(255,255,255,0.5);
     }
-    /* More Puzzles Section (Pagination & Reset Button) – Reverted to original from 11.html */
+    /* More Puzzles Section */
     #page-pagination {
       width: 100%;
       max-width: 480px;
@@ -264,6 +276,8 @@
     }
     .modal-more-puzzles {
       margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
     }
     .modal-more-puzzles em {
       display: block;
@@ -282,11 +296,73 @@
       padding: 5px;
     }
     .modal-pagination a:hover { opacity: 0.8; }
+
+    /* --- New CSS for color-blind patterns --- */
+    /* Red: Diagonal Stripes */
+    .tile.R {
+      background-color: #E9625A;
+      background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+      );
+    }
+    /* Green: Crosshatch Pattern */
+    .tile.G {
+      background-color: #43A95D;
+      background-image: 
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 4px,
+          rgba(0,0,0,0.05) 4px,
+          rgba(0,0,0,0.05) 8px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 4px,
+          rgba(0,0,0,0.05) 4px,
+          rgba(0,0,0,0.05) 8px
+        );
+      background-size: 8px 8px;
+    }
+    /* Yellow: Checkerboard Pattern */
+    .tile.Y {
+      background-color: #FDD538;
+      background-image: 
+        linear-gradient(
+          45deg,
+          rgba(0,0,0,0.05) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(0,0,0,0.05) 75%,
+          rgba(0,0,0,0.05) 100%
+        ),
+        linear-gradient(
+          45deg,
+          rgba(0,0,0,0.05) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(0,0,0,0.05) 75%,
+          rgba(0,0,0,0.05) 100%
+        );
+      background-size: 10px 10px;
+      background-position: 0 0, 5px 5px;
+    }
+    /* Blue remains unchanged */
+    .tile.B {
+      background-color: #4086D3;
+      background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 1px, transparent 1px);
+      background-size: 10px 10px;
+    }
   </style>
 </head>
 <body>
   <!-- Title -->
-  <h1>Paint it Free</h1>
+  <h1>Paint it Full</h1>
   
   <!-- Objectives Dropdown -->
   <div id="objectives-dropdown" class="objectives-dropdown">
@@ -294,11 +370,14 @@
       <h2>Objectives</h2>
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
+    <p class="objectives-description">
+      Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
+    </p>
     <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to to Blue 🟦 in 4 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Green 🟩 in 4 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Yellow 🟨 in 4 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Blue 🟦 within 6 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -312,12 +391,13 @@
         1. Pick a color from the options below the grid (e.g. 🔴)<br>
         2. Click on a color tile (e.g. 🟦) in grid to change to selected colour (🟦→🟥)<br>
         3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br>
-        <br>Give it a try!
+        4. Tiles in Grey are blocked and cannot be painted over.<br>
+        Give it a try!
       </p>
     </div>
   </div>
   
-  <!-- Your Score Section (initially shows three blank stars) -->
+  <!-- Your Score Section -->
   <div id="score-section">
     Your Score: <span id="score"></span>
   </div>
@@ -328,15 +408,15 @@
   <!-- Moves Made & Undo -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <button id="undo" title="Undo last move">↺</button>
+    <!-- <button id="undo" title="Undo last move">↺</button> -->
   </div>
   
   <!-- Color Picker -->
   <div class="color-picker">
-    <button class="color-btn" style="background: #E36E5D" data-color="#E36E5D"></button>
-    <button class="color-btn" style="background: #5CA587" data-color="#5CA587"></button>
-    <button class="color-btn" style="background: #73A9D8" data-color="#73A9D8"></button>
-    <button class="color-btn" style="background: #E3E846" data-color="#E3E846"></button>
+    <button class="color-btn" style="background: #E9625A" data-color="#E9625A"></button>
+    <button class="color-btn" style="background: #43A95D" data-color="#43A95D"></button>
+    <button class="color-btn" style="background: #4086D3" data-color="#4086D3"></button>
+    <button class="color-btn" style="background: #FDD538" data-color="#FDD538"></button>
   </div>
   
   <!-- More Puzzles Section (Pagination & Reset) -->
@@ -363,26 +443,26 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["Y", "Y", "Y", "B", "B", "G", "R", "R"],
-        ["Y", "Y", "B", "G", "R", "R", "R", "G"],
-        ["Y", "Y", "B", "Y", "Y", "G", "B", "G"],
-        ["Y", "Y", "G", "R", "Y", "G", "R", "B"],
-        ["Y", "Y", "G", "R", "Y", "Y", "Y", "R"],
-        ["Y", "Y", "G", "G", "B", "G", "Y", "G"],
-        ["G", "G", "Y", "Y", "Y", "B", "Y", "G"],
-        ["G", "R", "Y", "Y", "Y", "B", "Y", "G"],
-        ["R", "R", "B", "B", "R", "G", "Y", "Y"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["R", "R", "Y", "G", "G", "Y", "B", "B"],
+        ["R", "R", "Y", "G", "G", "Y", "B", "B"],
+        ["B", "B", "B", "B", "B", "R", "B", "B"],
+        ["G", "G", "Y", "R", "G", "B", "G", "G"],
+        ["G", "G", "Y", "G", "R", "B", "G", "G"],
+        ["Y", "Y", "R", "Y", "Y", "Y", "Y", "Y"],
+        ["Y", "Y", "B", "G", "G", "B", "R", "R"],
+        ["Y", "Y", "B", "G", "G", "B", "R", "R"],
         ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"]
       ],
-      maxMoves: 7,
+      maxMoves: 8,
       winConditions: [
-        { color: "B", moves: 4, description: "Turn all tiles to Blue 🟦 in 4 moves" },
-        { color: "G", moves: 4, description: "Turn all tiles to Green 🟩 in 4 moves" },
-        { color: "Y", moves: 4, description: "Turn all tiles to Yellow 🟨 in 4 moves" }
+        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
+        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
+        { color: "B", moves: 6, description: "Turn all tiles to Blue 🟦 within 6 moves" }
       ],
       pagination: {
-        currentPage: 12,
-        maxPage: 12,
+        currentPage: 24,
+        maxPage: 24,
         showPrev: true,
         showNext: true,
         prevText: "⏪<br><em>Previous</em>",
@@ -390,23 +470,30 @@
       }
     };
     
-    // Flag to ensure auto-win modal only shows once.
     let autoWinModalShown = false;
+    let isAnimating = false;
     
     // ================= UTILITY FUNCTIONS =================
-    function letterToHex(letter) {
-      if(letter === "R") return "rgba(227,110,93,0.8)";
-      if(letter === "G") return "rgba(92,165,135,0.8)";
-      if(letter === "B") return "rgba(115,169,216,0.8)";
-      if(letter === "Y") return "rgba(227,232,70,0.8)";
-      return "";
-    }
-    function hexToLetter(hex) {
-      if(hex === "#E36E5D") return "R";
-      if(hex === "#5CA587") return "G";
-      if(hex === "#73A9D8") return "B";
-      if(hex === "#E3E846") return "Y";
-      return "";
+    function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
+      const visited = new Set();
+      const result = [];
+      const queue = [{ r: startRow, c: startCol, level: 0 }];
+      visited.add(`${startRow},${startCol}`);
+      while(queue.length > 0) {
+        const { r, c, level } = queue.shift();
+        result.push({ r, c, level });
+        const neighbors = [[r-1,c], [r+1,c], [r, c-1], [r, c+1]];
+        for (const [nr, nc] of neighbors) {
+          if(nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
+            const key = `${nr},${nc}`;
+            if (!visited.has(key) && currentGrid[nr][nc] === targetLetter) {
+              visited.add(key);
+              queue.push({ r: nr, c: nc, level: level + 1 });
+            }
+          }
+        }
+      }
+      return result;
     }
     
     // ================= GAME STATE =================
@@ -414,7 +501,6 @@
     let selectedColor = null;
     let movesMade = 0;
     let history = [];
-    // starsAchieved holds achievement status for each win condition (persists across resets)
     let starsAchieved = [false, false, false];
     
     // ================= GRID CREATION =================
@@ -424,10 +510,10 @@
       grid.style.gridTemplateColumns = `repeat(${CONFIG.initialGrid[0].length}, 1fr)`;
       CONFIG.initialGrid.forEach((row, i) => {
         row.forEach((letter, j) => {
-          const hex = letterToHex(letter);
           const tile = document.createElement('div');
           tile.className = 'tile';
-          tile.style.backgroundColor = hex;
+          // Assign the letter as an extra class for styling (e.g. R, G, B, Y)
+          tile.classList.add(letter);
           tile.dataset.row = i;
           tile.dataset.col = j;
           tile.addEventListener('click', handleTileClick);
@@ -440,7 +526,7 @@
     
     // ================= MOVE HANDLING =================
     function handleTileClick(e) {
-      if (!selectedColor || movesMade >= CONFIG.maxMoves) return;
+      if (!selectedColor || movesMade >= CONFIG.maxMoves || isAnimating) return;
       
       const row = parseInt(e.target.dataset.row);
       const col = parseInt(e.target.dataset.col);
@@ -452,55 +538,65 @@
         moves: movesMade
       });
       
-      const tilesToChange = getConnectedTiles(row, col, targetLetter);
-      let maxDelay = 0;
-      if (tilesToChange.length > 0) {
-        tilesToChange.forEach(([r, c]) => {
-          const distance = Math.abs(r - row) + Math.abs(c - col);
-          const delay = distance * 0.05;
-          if (delay > maxDelay) maxDelay = delay;
-          const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-          tile.style.transitionDelay = `${delay}s`;
-          setTimeout(() => {
-            tile.classList.add("pop");
-            setTimeout(() => tile.classList.remove("pop"), 300);
-          }, delay * 1000);
-          currentGrid[r][c] = selectedColor;
-          tile.style.backgroundColor = letterToHex(selectedColor);
+      const tilesWithLevels = getConnectedTilesWithLevels(row, col, targetLetter);
+      const groups = {};
+      tilesWithLevels.forEach(({r, c, level}) => {
+        if (!groups[level]) groups[level] = [];
+        groups[level].push({r, c});
+      });
+      
+      movesMade++;
+      document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      
+      isAnimating = true;
+      const delayFactorMs = 100;
+      const pendingAnimations = [];
+      const startTime = performance.now();
+      
+      for (const level in groups) {
+        pendingAnimations.push({
+          level: parseInt(level),
+          scheduledTime: startTime + parseInt(level) * delayFactorMs,
+          tiles: groups[level],
+          played: false
         });
-        movesMade++;
-        document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
-        updateStars();
-        updateScoreDisplay();
-        setTimeout(() => {
+      }
+      
+      function animateGroups(currentTime) {
+        pendingAnimations.forEach(animation => {
+          if (!animation.played && currentTime >= animation.scheduledTime) {
+            animation.tiles.forEach(({r, c}) => {
+              const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+              tile.classList.add("pop");
+              setTimeout(() => tile.classList.remove("pop"), 300);
+              currentGrid[r][c] = selectedColor;
+              // Update the tile's color class: remove the old letter and add the new one.
+              tile.classList.remove(targetLetter);
+              tile.classList.add(selectedColor);
+            });
+            const baseVolume = 1.0;
+            const reductionFactor = 0.1;
+            const volume = Math.max(baseVolume - (animation.level * reductionFactor), 0.1);
+            playPopSound(volume);
+            animation.played = true;
+          }
+        });
+        if (pendingAnimations.some(animation => !animation.played)) {
+          requestAnimationFrame(animateGroups);
+        } else {
+          updateStars();
+          updateScoreDisplay();
+          isAnimating = false;
           if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
             showModal("Nah! Try Again!", false);
           } else if (starsAchieved.filter(s => s).length === 3 && !autoWinModalShown) {
-            showModal("Bravo! You got it!", true);
+            showModal("Bravo! You won!", true);
             autoWinModalShown = true;
           }
-        }, maxDelay * 1000 + 300);
+        }
       }
-    }
-    
-    function getConnectedTiles(startRow, startCol, targetLetter) {
-      const visited = new Set();
-      const queue = [[startRow, startCol]];
-      const connected = [];
-      while (queue.length > 0) {
-        const [r, c] = queue.shift();
-        const key = `${r},${c}`;
-        if (visited.has(key)) continue;
-        if (currentGrid[r]?.[c] !== targetLetter) continue;
-        visited.add(key);
-        connected.push([r, c]);
-        [[r-1, c], [r+1, c], [r, c-1], [r, c+1]].forEach(([nr, nc]) => {
-          if (nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
-            queue.push([nr, nc]);
-          }
-        });
-      }
-      return connected;
+      
+      requestAnimationFrame(animateGroups);
     }
     
     // ================= STAR & SCORE UPDATES =================
@@ -521,14 +617,9 @@
     
     function updateScoreDisplay() {
       let achievedCount = starsAchieved.filter(s => s).length;
-      let displayCount = 0;
-      if (achievedCount > 0) {
-        if (starsAchieved[0]) displayCount = achievedCount;
-        else displayCount = 1;
-      }
       let scoreHTML = "";
       for (let i = 0; i < 3; i++) {
-        if (i < displayCount) {
+        if (i < achievedCount) {
           scoreHTML += '<span class="star achieved" style="font-size:1.4em; margin:0 2px;">★</span>';
         } else {
           scoreHTML += '<span class="star" style="font-size:1.4em; margin:0 2px;">☆</span>';
@@ -539,6 +630,7 @@
     
     // ================= RESET & UNDO =================
     function resetGame() {
+      if(isAnimating) return;
       currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
       movesMade = 0;
       history = [];
@@ -557,7 +649,8 @@
         const row = Math.floor(i / CONFIG.initialGrid[0].length);
         const col = i % CONFIG.initialGrid[0].length;
         const letter = currentGrid[row][col];
-        tile.style.backgroundColor = letterToHex(letter);
+        // Reset the tile's classes: always have "tile" then add the letter.
+        tile.className = 'tile ' + letter;
       });
     }
     
@@ -577,6 +670,12 @@
       });
       objectivesHTML += '</ul>';
       modalObjectives.innerHTML = objectivesHTML;
+      if (isWin) {
+        document.getElementById('modal-more-puzzles').style.display = 'block';
+        updateModalPagination();
+      } else {
+        document.getElementById('modal-more-puzzles').style.display = 'none';
+      }
       modal.style.display = 'flex';
     }
     
@@ -587,12 +686,7 @@
     // ================= EVENT LISTENERS =================
     document.getElementById('score').addEventListener('click', () => {
       let achievedCount = starsAchieved.filter(s => s).length;
-      let displayCount = 0;
-      if (achievedCount > 0) {
-        if (starsAchieved[0]) displayCount = achievedCount;
-        else displayCount = 1;
-      }
-      showModal(`Your Stars: ${displayCount}/3`, displayCount === 3);
+      showModal(`Your Stars: ${achievedCount}/3`, achievedCount === 3);
     });
     
     document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -613,7 +707,6 @@
       }
     });
     
-    // How To Play Toggle
     document.getElementById('toggle-arrow').addEventListener('click', () => {
       const content = document.getElementById('how-to-play-content');
       if (content.style.display === 'none' || content.style.display === '') {
@@ -625,7 +718,6 @@
       }
     });
     
-    // ================= PAGINATION (More Puzzles Section) =================
     function updatePagePagination() {
       const pagePagination = document.getElementById("page-pagination");
       const currentPage = CONFIG.pagination.currentPage;
@@ -670,14 +762,39 @@
     
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        if(isAnimating) return;
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedColor = hexToLetter(btn.dataset.color);
+        if (typeof audioContext !== 'undefined' && audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
       });
       btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
     });
     
-    document.getElementById('undo').addEventListener('click', undoMove);
+    // Helper: Convert hex to letter for selectedColor.
+    function hexToLetter(hex) {
+      if(hex === "#E9625A") return "R";
+      if(hex === "#43A95D") return "G";
+      if(hex === "#4086D3") return "B";
+      if(hex === "#FDD538") return "Y";
+      return "";
+    }
+
+    // Undo event listener (commented-out sections preserved)
+    // document.getElementById('undo').addEventListener('click', undoMove);
+    // document.getElementById('undo').addEventListener('touchstart', (e) => {
+    //    e.preventDefault();
+    //    undoMove();
+    // });
+    
+    // Placeholder for pop sound playback function (assumes existing implementation)
+    function playPopSound(volume) {
+      // Existing sound playing code.
+      // This function should play the pop sound with the given volume.
+    }
+    
   </script>
 </body>
 </html>
