@@ -365,6 +365,63 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.6);
       transform: translateY(-2px);
     }
+    /* --- New CSS for color picker patterns --- */
+    .color-btn.R {
+    background-color: #E9625A !important;
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+    ) !important;
+    }
+    .color-btn.G {
+    background-color: #43A95D !important;
+    background-image: 
+        repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+        ),
+        repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+        ) !important;
+    background-size: 8px 8px !important;
+    }
+    .color-btn.B {
+    background-color: #4086D3 !important;
+    background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 1px, transparent 1px) !important;
+    background-size: 10px 10px !important;
+    }
+    .color-btn.Y {
+    background-color: #FDD538 !important;
+    background-image: 
+        linear-gradient(
+        45deg,
+        rgba(0,0,0,0.05) 25%,
+        transparent 25%,
+        transparent 75%,
+        rgba(0,0,0,0.05) 75%,
+        rgba(0,0,0,0.05) 100%
+        ),
+        linear-gradient(
+        45deg,
+        rgba(0,0,0,0.05) 25%,
+        transparent 25%,
+        transparent 75%,
+        rgba(0,0,0,0.05) 75%,
+        rgba(0,0,0,0.05) 100%
+        ) !important;
+    background-size: 10px 10px !important;
+    background-position: 0 0, 5px 5px !important;
+    }
   </style>
 </head>
 <body>
@@ -382,9 +439,9 @@
     </p>
     <div id="objectives-content">
       <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 within 6 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Yellow 🟨 within 6 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Blue 🟦 within 6 moves <span class="star" id="star-2">☆</span></li>
+        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
+        <li data-index="1">Turn all tiles to Green 🟩 within 5 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="2">Turn all tiles to Yellow 🟨 within 5 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
   </div>
@@ -415,16 +472,17 @@
   <!-- Moves Made & Undo -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <!-- <button id="undo" title="Undo last move">↺</button> -->
+    <button id="undo" title="Undo last move">↺</button>
   </div>
   
   <!-- Color Picker -->
   <div class="color-picker">
-    <button class="color-btn" style="background: #E9625A" data-color="#E9625A"></button>
-    <button class="color-btn" style="background: #43A95D" data-color="#43A95D"></button>
-    <button class="color-btn" style="background: #4086D3" data-color="#4086D3"></button>
-    <button class="color-btn" style="background: #FDD538" data-color="#FDD538"></button>
+    <button class="color-btn R" data-color="#E9625A"></button>
+    <button class="color-btn G" data-color="#43A95D"></button>
+    <button class="color-btn B" data-color="#4086D3"></button>
+    <button class="color-btn Y" data-color="#FDD538"></button>
   </div>
+  
   
   <!-- More Puzzles Section (Pagination & Reset) -->
   <div id="page-pagination" class="pagination"></div>
@@ -450,26 +508,26 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["R", "R", "Y", "G", "G", "Y", "R", "R"],
-        ["R", "R", "Y", "G", "G", "Y", "R", "R"],
-        ["B", "B", "B", "B", "B", "X", "B", "B"],
-        ["G", "G", "Y", "R", "G", "B", "G", "G"],
-        ["G", "G", "Y", "G", "R", "B", "G", "G"],
-        ["Y", "Y", "X", "Y", "Y", "Y", "Y", "Y"],
-        ["Y", "Y", "B", "G", "G", "B", "R", "R"],
-        ["Y", "Y", "B", "G", "G", "B", "R", "R"],
-        ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"]
+        ["G", "R", "R", "R", "R", "R", "R", "R"],
+        ["G", "R", "G", "G", "G", "G", "G", "G"],
+        ["G", "R", "G", "Y", "Y", "Y", "Y", "G"],
+        ["G", "R", "G", "Y", "B", "B", "B", "G"],
+        ["G", "R", "G", "Y", "B", "R", "R", "G"],
+        ["G", "R", "G", "Y", "G", "R", "R", "G"],
+        ["G", "R", "B", "B", "B", "Y", "Y", "G"],
+        ["G", "R", "B", "B", "B", "Y", "Y", "G"],
+        ["Y", "X", "B", "B", "R", "B", "B", "G"],
+        ["R", "X", "R", "R", "R", "Y", "G", "B"]
       ],
       maxMoves: 8,
       winConditions: [
-        { color: "R", moves: 6, description: "Turn all tiles to Red 🟥 within 6 moves" },
-        { color: "Y", moves: 6, description: "Turn all tiles to Yellow 🟨 within 6 moves" },
-        { color: "B", moves: 6, description: "Turn all tiles to Blue 🟦 within 6 moves" }
+        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 within 5 moves" },
+        { color: "G", moves: 5, description: "Turn all tiles to Green 🟩 within 5 moves" },
+        { color: "Y", moves: 5, description: "Turn all tiles to Yellow 🟨 within 5 moves" }
       ],
       pagination: {
-        currentPage: 24,
-        maxPage: 24,
+        currentPage: 25,
+        maxPage: 25,
         showPrev: true,
         showNext: true,
         prevText: "⏪<br><em>Previous</em>",
@@ -661,7 +719,12 @@
         const row = Math.floor(i / CONFIG.initialGrid[0].length);
         const col = i % CONFIG.initialGrid[0].length;
         const letter = currentGrid[row][col];
-        tile.className = 'tile ' + letter;
+        if (letter === "X") {
+            tile.className = 'tile blocked X';
+        } else {
+            tile.className = 'tile ' + letter;
+        }
+
       });
     }
     
@@ -697,7 +760,7 @@
     // ================= EVENT LISTENERS =================
     document.getElementById('score').addEventListener('click', () => {
       let achievedCount = starsAchieved.filter(s => s).length;
-      showModal(`Your Stars: ${achievedCount}/3`, achievedCount === 3);
+      showModal(`Score: ${achievedCount}/3`, achievedCount === 3);
     });
     
     document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -794,11 +857,11 @@
     }
     
     // Undo event listener (commented-out sections preserved)
-    // document.getElementById('undo').addEventListener('click', undoMove);
-    // document.getElementById('undo').addEventListener('touchstart', (e) => {
-    //    e.preventDefault();
-    //    undoMove();
-    // });
+    document.getElementById('undo').addEventListener('click', undoMove);
+    document.getElementById('undo').addEventListener('touchstart', (e) => {
+       e.preventDefault();
+       undoMove();
+    });
     
     // Placeholder for pop sound playback function (assumes existing implementation)
     function playPopSound(volume) {

@@ -358,6 +358,13 @@
       background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 1px, transparent 1px);
       background-size: 10px 10px;
     }
+    /* Blocked tiles: always grey */
+    .tile.blocked {
+      background-color: rgba(161,166,179,0.8);
+      border: 2px solid #898d95;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -444,12 +451,12 @@
     const CONFIG = {
       initialGrid: [
         ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["R", "R", "Y", "G", "G", "Y", "B", "B"],
-        ["R", "R", "Y", "G", "G", "Y", "B", "B"],
-        ["B", "B", "B", "B", "B", "R", "B", "B"],
+        ["R", "R", "Y", "G", "G", "Y", "R", "R"],
+        ["R", "R", "Y", "G", "G", "Y", "R", "R"],
+        ["B", "B", "B", "B", "B", "X", "B", "B"],
         ["G", "G", "Y", "R", "G", "B", "G", "G"],
         ["G", "G", "Y", "G", "R", "B", "G", "G"],
-        ["Y", "Y", "R", "Y", "Y", "Y", "Y", "Y"],
+        ["Y", "Y", "X", "Y", "Y", "Y", "Y", "Y"],
         ["Y", "Y", "B", "G", "G", "B", "R", "R"],
         ["Y", "Y", "B", "G", "G", "B", "R", "R"],
         ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"]
@@ -462,7 +469,7 @@
       ],
       pagination: {
         currentPage: 24,
-        maxPage: 24,
+        maxPage: 25,
         showPrev: true,
         showNext: true,
         prevText: "⏪<br><em>Previous</em>",
@@ -512,12 +519,17 @@
         row.forEach((letter, j) => {
           const tile = document.createElement('div');
           tile.className = 'tile';
-          // Assign the letter as an extra class for styling (e.g. R, G, B, Y)
+          // Always add the letter as an extra class (for CSS patterns)
           tile.classList.add(letter);
           tile.dataset.row = i;
           tile.dataset.col = j;
-          tile.addEventListener('click', handleTileClick);
-          tile.addEventListener('touchstart', handleTileClick);
+          // Only attach click events if not a blocked tile
+          if(letter === "X") {
+            tile.classList.add("blocked");
+          } else {
+            tile.addEventListener('click', handleTileClick);
+            tile.addEventListener('touchstart', handleTileClick);
+          }
           grid.appendChild(tile);
         });
       });
@@ -570,7 +582,6 @@
               tile.classList.add("pop");
               setTimeout(() => tile.classList.remove("pop"), 300);
               currentGrid[r][c] = selectedColor;
-              // Update the tile's color class: remove the old letter and add the new one.
               tile.classList.remove(targetLetter);
               tile.classList.add(selectedColor);
             });
@@ -602,8 +613,9 @@
     // ================= STAR & SCORE UPDATES =================
     function updateStars() {
       CONFIG.winConditions.forEach((condition, index) => {
+        // Update win check to allow blocked cells ("X")
         if (!starsAchieved[index] && movesMade <= condition.moves) {
-          if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
+          if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
             starsAchieved[index] = true;
             const starElem = document.getElementById(`star-${index}`);
             starElem.classList.add("achieved");
@@ -649,7 +661,6 @@
         const row = Math.floor(i / CONFIG.initialGrid[0].length);
         const col = i % CONFIG.initialGrid[0].length;
         const letter = currentGrid[row][col];
-        // Reset the tile's classes: always have "tile" then add the letter.
         tile.className = 'tile ' + letter;
       });
     }
@@ -781,7 +792,7 @@
       if(hex === "#FDD538") return "Y";
       return "";
     }
-
+    
     // Undo event listener (commented-out sections preserved)
     // document.getElementById('undo').addEventListener('click', undoMove);
     // document.getElementById('undo').addEventListener('touchstart', (e) => {
@@ -792,7 +803,6 @@
     // Placeholder for pop sound playback function (assumes existing implementation)
     function playPopSound(volume) {
       // Existing sound playing code.
-      // This function should play the pop sound with the given volume.
     }
     
   </script>
