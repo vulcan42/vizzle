@@ -472,7 +472,7 @@
   <!-- Moves Made & Undo -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <button id="undo" title="Undo last move">↺</button>
+    <!-- <button id="undo" title="Undo last move">↺</button> -- >
   </div>
   
   <!-- Color Picker -->
@@ -857,11 +857,11 @@
     }
     
     // Undo event listener (commented-out sections preserved)
-    document.getElementById('undo').addEventListener('click', undoMove);
-    document.getElementById('undo').addEventListener('touchstart', (e) => {
-       e.preventDefault();
-       undoMove();
-    });
+    // document.getElementById('undo').addEventListener('click', undoMove);
+    // document.getElementById('undo').addEventListener('touchstart', (e) => {
+    //    e.preventDefault();
+    //    undoMove();
+    // });
     
     // Placeholder for pop sound playback function (assumes existing implementation)
     function playPopSound(volume) {
