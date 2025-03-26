@@ -166,14 +166,7 @@
     .pop {
       animation: pop 0.3s ease;
     }
-    /* Blocked Tiles (Walls) */
-    .tile.blocked {
-      background-color: rgba(161,166,179,0.8);
-      border: 2px solid #898d95;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-      transform: translateY(-2px);
-    }
-    /* Moves and Undo */  
+    /* Moves Made & Undo */  
     #moves-container {
       display: flex;
       align-items: center;
@@ -448,7 +441,7 @@
     <div id="objectives-content">
       <ul>
         <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Green 🟩 within 5 moves <span class="star" id="star-1">☆</span></li>
+        <li data-index="1">Turn all tiles to Blue 🟦 within 5 moves <span class="star" id="star-1">☆</span></li>
         <li data-index="2">Turn all tiles to Yellow 🟨 within 5 moves <span class="star" id="star-2">☆</span></li>
       </ul>
     </div>
@@ -516,25 +509,25 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["G", "R", "R", "R", "R", "R", "R", "R"],
-        ["G", "R", "G", "G", "G", "G", "G", "G"],
-        ["G", "R", "G", "Y", "Y", "Y", "Y", "G"],
-        ["G", "R", "G", "Y", "B", "B", "B", "G"],
-        ["G", "R", "G", "Y", "B", "R", "R", "G"],
-        ["G", "R", "G", "Y", "G", "R", "R", "G"],
-        ["G", "R", "B", "B", "B", "Y", "Y", "G"],
-        ["G", "R", "B", "B", "B", "Y", "Y", "G"],
-        ["Y", "X", "B", "B", "R", "B", "B", "G"],
-        ["R", "X", "R", "R", "R", "Y", "G", "B"]
+        ["R", "R", "R", "R", "B", "R", "R", "R"],
+        ["B", "B", "B", "B", "G", "Y", "Y", "Y"],
+        ["G", "G", "G", "G", "R", "B", "B", "B"],
+        ["Y", "Y", "Y", "Y", "Y", "G", "G", "G"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "B", "B", "B", "B", "B"]
       ],
-      maxMoves: 7,
+      maxMoves: 6,
       winConditions: [
         { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 within 5 moves" },
-        { color: "G", moves: 5, description: "Turn all tiles to Green 🟩 within 5 moves" },
+        { color: "B", moves: 5, description: "Turn all tiles to Blue 🟦 within 5 moves" },
         { color: "Y", moves: 5, description: "Turn all tiles to Yellow 🟨 within 5 moves" }
       ],
       pagination: {
-        currentPage: 25,
+        currentPage: 26,
         maxPage: 26,
         showPrev: true,
         showNext: true,
@@ -770,7 +763,6 @@
         } else {
             tile.className = 'tile ' + letter;
         }
-
       });
     }
     
