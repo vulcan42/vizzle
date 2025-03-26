@@ -143,6 +143,7 @@
       width: 100%;
       aspect-ratio: 1/1;
       transition: background 0.3s ease, transform 0.3s ease;
+      /* Hint for GPU acceleration */
       will-change: transform, background;
       display: flex;
       justify-content: center;
@@ -165,7 +166,14 @@
     .pop {
       animation: pop 0.3s ease;
     }
-    /* Moves Made & Undo */
+    /* Blocked Tiles (Walls) */
+    .tile.blocked {
+      background-color: rgba(161,166,179,0.8);
+      border: 2px solid #898d95;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
+    /* Moves and Undo */  
     #moves-container {
       display: flex;
       align-items: center;
@@ -536,7 +544,42 @@
     };
     
     let autoWinModalShown = false;
-    let isAnimating = false;
+    let isAnimating = false; // Global flag to block actions during animation
+    
+    // ================= WEB AUDIO API SETUP =================
+    // Create AudioContext (with vendor prefixes)
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let popBuffer = null;
+    
+    // Load and decode the MP3 file
+    fetch('sounds/pop.mp3')
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+      .then(decodedData => {
+        popBuffer = decodedData;
+        console.log('Audio loaded and decoded, sample rate:', audioContext.sampleRate);
+      })
+      .catch(e => console.error('Error loading audio file:', e));
+    
+    // Function to play the pop sound at a given volume using Web Audio API
+    function playPopSound(volume = 1.0) {
+      if (!popBuffer) {
+        console.warn('Audio buffer not loaded yet.');
+        return;
+      }
+      const source = audioContext.createBufferSource();
+      source.buffer = popBuffer;
+      source.playbackRate.value = 1.0; // Ensure normal playback rate (no pitch shift)
+      
+      const gainNode = audioContext.createGain();
+      // Optionally, use a ramp for smooth gain change:
+      // gainNode.gain.setTargetAtTime(volume, audioContext.currentTime, 0.01);
+      gainNode.gain.value = volume;
+      
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      source.start(0);
+    }
     
     // ================= UTILITY FUNCTIONS =================
     function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
@@ -618,8 +661,9 @@
       movesMade++;
       document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
       
+      // Begin animation: block all other actions.
       isAnimating = true;
-      const delayFactorMs = 100;
+      const delayFactorMs = 100; // 0.1 sec per level
       const pendingAnimations = [];
       const startTime = performance.now();
       
@@ -655,6 +699,7 @@
         } else {
           updateStars();
           updateScoreDisplay();
+          // End of animation - re-enable actions.
           isAnimating = false;
           if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
             showModal("Nah! Try Again!", false);
@@ -671,7 +716,7 @@
     // ================= STAR & SCORE UPDATES =================
     function updateStars() {
       CONFIG.winConditions.forEach((condition, index) => {
-        // Update win check to allow blocked cells ("X")
+        // Ignore blocked tiles ("X") in the win condition check.
         if (!starsAchieved[index] && movesMade <= condition.moves) {
           if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
             starsAchieved[index] = true;
@@ -700,6 +745,7 @@
     
     // ================= RESET & UNDO =================
     function resetGame() {
+      // Disallow reset during animation.
       if(isAnimating) return;
       currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
       movesMade = 0;
@@ -780,7 +826,7 @@
         toggleArrow.textContent = '▼';
       }
     });
-    
+    // How To Play Toggle
     document.getElementById('toggle-arrow').addEventListener('click', () => {
       const content = document.getElementById('how-to-play-content');
       if (content.style.display === 'none' || content.style.display === '') {
@@ -791,7 +837,7 @@
         document.getElementById('toggle-arrow').textContent = '▼';
       }
     });
-    
+    // ================= PAGINATION =================
     function updatePagePagination() {
       const pagePagination = document.getElementById("page-pagination");
       const currentPage = CONFIG.pagination.currentPage;
@@ -836,10 +882,12 @@
     
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        // Disallow changing color during animation.
         if(isAnimating) return;
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedColor = hexToLetter(btn.dataset.color);
+        // Unlock the AudioContext on iOS if necessary:
         if (typeof audioContext !== 'undefined' && audioContext.state === 'suspended') {
           audioContext.resume();
         }
@@ -863,10 +911,7 @@
     //    undoMove();
     // });
     
-    // Placeholder for pop sound playback function (assumes existing implementation)
-    function playPopSound(volume) {
-      // Existing sound playing code.
-    }
+  
     
   </script>
 </body>
