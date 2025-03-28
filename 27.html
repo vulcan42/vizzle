@@ -67,26 +67,14 @@
       display: none;
       margin-top: 5px;
     }
-    #objectives-content ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    #objectives-content li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-      padding-left: 30px;
-      max-width: 360px;
-    }
+    /* Star styling */
     .star {
       font-size: 1.2em;
       transition: transform 0.3s ease;
-      color: #fff;
+      /* For unachieved stars, the color and border will be set inline */
     }
     .star.achieved {
-      color: gold;
+      /* Remove forced color here so inline styles prevail */
       text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     }
     /* How To Play Dropdown */
@@ -166,7 +154,7 @@
     .pop {
       animation: pop 0.3s ease;
     }
-    /* Moves Made & Undo */  
+    /* Moves Made & Undo */
     #moves-container {
       display: flex;
       align-items: center;
@@ -175,6 +163,7 @@
       font-size: 1.3em;
       margin: 10px 0;
     }
+    /* Undo button: will be shown or hidden based on CONFIG.showUndo */
     #undo {
       background: transparent;
       border: 1px solid #fff;
@@ -353,7 +342,7 @@
       background-size: 10px 10px;
       background-position: 0 0, 5px 5px;
     }
-    /* Blue remains unchanged */
+    /* Blue: Small dots Pattern */
     .tile.B {
       background-color: #4086D3;
       background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 1px, transparent 1px);
@@ -368,60 +357,60 @@
     }
     /* --- New CSS for color picker patterns --- */
     .color-btn.R {
-    background-color: #E9625A !important;
-    background-image: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 4px,
-        rgba(0,0,0,0.05) 4px,
-        rgba(0,0,0,0.05) 8px
-    ) !important;
+      background-color: #E9625A !important;
+      background-image: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 4px,
+          rgba(0,0,0,0.05) 4px,
+          rgba(0,0,0,0.05) 8px
+      ) !important;
     }
     .color-btn.G {
-    background-color: #43A95D !important;
-    background-image: 
-        repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 4px,
-        rgba(0,0,0,0.05) 4px,
-        rgba(0,0,0,0.05) 8px
-        ),
-        repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 4px,
-        rgba(0,0,0,0.05) 4px,
-        rgba(0,0,0,0.05) 8px
-        ) !important;
-    background-size: 8px 8px !important;
+      background-color: #43A95D !important;
+      background-image: 
+          repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 4px,
+          rgba(0,0,0,0.05) 4px,
+          rgba(0,0,0,0.05) 8px
+          ),
+          repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 4px,
+          rgba(0,0,0,0.05) 4px,
+          rgba(0,0,0,0.05) 8px
+          ) !important;
+      background-size: 8px 8px !important;
     }
     .color-btn.B {
-    background-color: #4086D3 !important;
-    background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 1px, transparent 1px) !important;
-    background-size: 10px 10px !important;
+      background-color: #4086D3 !important;
+      background-image: radial-gradient(circle at center, rgba(0,0,0,0.1) 1px, transparent 1px) !important;
+      background-size: 10px 10px !important;
     }
     .color-btn.Y {
-    background-color: #FDD538 !important;
-    background-image: 
-        linear-gradient(
-        45deg,
-        rgba(0,0,0,0.05) 25%,
-        transparent 25%,
-        transparent 75%,
-        rgba(0,0,0,0.05) 75%,
-        rgba(0,0,0,0.05) 100%
-        ),
-        linear-gradient(
-        45deg,
-        rgba(0,0,0,0.05) 25%,
-        transparent 25%,
-        transparent 75%,
-        rgba(0,0,0,0.05) 75%,
-        rgba(0,0,0,0.05) 100%
-        ) !important;
-    background-size: 10px 10px !important;
-    background-position: 0 0, 5px 5px !important;
+      background-color: #FDD538 !important;
+      background-image: 
+          linear-gradient(
+          45deg,
+          rgba(0,0,0,0.05) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(0,0,0,0.05) 75%,
+          rgba(0,0,0,0.05) 100%
+          ),
+          linear-gradient(
+          45deg,
+          rgba(0,0,0,0.05) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(0,0,0,0.05) 75%,
+          rgba(0,0,0,0.05) 100%
+          ) !important;
+      background-size: 10px 10px !important;
+      background-position: 0 0, 5px 5px !important;
     }
   </style>
 </head>
@@ -436,15 +425,8 @@
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
     <p class="objectives-description">
-      Get All 3 Stars. Click on <span class="toggle-arrow-text">▼</span> to see detailed objectives.
-    </p>
-    <div id="objectives-content">
-      <ul>
-        <li data-index="0">Turn all tiles to Red 🟥 within 5 moves <span class="star" id="star-0">☆</span></li>
-        <li data-index="1">Turn all tiles to Blue 🟦 within 5 moves <span class="star" id="star-1">☆</span></li>
-        <li data-index="2">Turn all tiles to Yellow 🟨 within 5 moves <span class="star" id="star-2">☆</span></li>
-      </ul>
-    </div>
+    <!-- Objectives content will be generated dynamically -->
+    <div id="objectives-content"></div>
   </div>
   
   <!-- How To Play Section -->
@@ -464,7 +446,7 @@
   
   <!-- Your Score Section -->
   <div id="score-section">
-    Your Score: <span id="score"></span>
+    <span id="score"></span>
   </div>
   
   <!-- Grid -->
@@ -473,7 +455,8 @@
   <!-- Moves Made & Undo -->
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
-    <!-- <button id="undo" title="Undo last move">↺</button> -->
+    <!-- Undo button will be shown based on CONFIG.showUndo -->
+    <button id="undo">↺</button>
   </div>
   
   <!-- Color Picker -->
@@ -483,7 +466,6 @@
     <button class="color-btn B" data-color="#4086D3"></button>
     <button class="color-btn Y" data-color="#FDD538"></button>
   </div>
-  
   
   <!-- More Puzzles Section (Pagination & Reset) -->
   <div id="page-pagination" class="pagination"></div>
@@ -509,42 +491,46 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "R", "R", "R", "B", "R", "R", "R"],
-        ["B", "B", "B", "B", "G", "Y", "Y", "Y"],
-        ["G", "G", "G", "G", "R", "B", "B", "B"],
-        ["Y", "Y", "Y", "Y", "Y", "G", "G", "G"],
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["B", "B", "B", "B", "B", "B", "B", "B"],
-        ["B", "B", "B", "B", "B", "B", "B", "B"]
+        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
+        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
+        ["B", "R", "X", "R", "R", "R", "G", "B"],
+        ["Y", "R", "G", "B", "G", "R", "G", "Y"],
+        ["B", "R", "G", "B", "G", "R", "G", "B"],
+        ["B", "R", "G", "R", "B", "R", "G", "B"],
+        ["Y", "R", "G", "R", "B", "R", "G", "Y"],
+        ["B", "R", "G", "G", "G", "X", "G", "B"],
+        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
+        ["B", "B", "Y", "B", "B", "Y", "B", "B"]
       ],
-      maxMoves: 6,
+      maxMoves: 8,
       winConditions: [
-        { color: "R", moves: 5, description: "Turn all tiles to Red 🟥 within 5 moves" },
-        { color: "B", moves: 5, description: "Turn all tiles to Blue 🟦 within 5 moves" },
-        { color: "Y", moves: 5, description: "Turn all tiles to Yellow 🟨 within 5 moves" }
+        { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (min. 5 moves)" },
+        { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (min. 5 moves)" },
+        { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (min. 5 moves)" },
+        { color: "Y", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Yellow 🟨 (min. 5 moves)" }
       ],
+      scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 26,
+        currentPage: 27,
         maxPage: 27,
         showPrev: true,
         showNext: true,
         prevText: "⏪<br><em>Previous</em>",
         nextText: "⏩<br><em>Next</em>"
-      }
+      },
+      // Toggle for displaying the Undo button
+      showUndo: false
     };
     
     let autoWinModalShown = false;
-    let isAnimating = false; // Global flag to block actions during animation
+    let isAnimating = false;
+    // Global arrays to track achievement status and colors
+    let starsAchieved = [false, false, false, false];
+    let achievedColors = [null, null, null, null];
     
     // ================= WEB AUDIO API SETUP =================
-    // Create AudioContext (with vendor prefixes)
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     let popBuffer = null;
-    
-    // Load and decode the MP3 file
     fetch('sounds/pop.mp3')
       .then(response => response.arrayBuffer())
       .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
@@ -563,18 +549,44 @@
       const source = audioContext.createBufferSource();
       source.buffer = popBuffer;
       source.playbackRate.value = 1.0; // Ensure normal playback rate (no pitch shift)
-      
       const gainNode = audioContext.createGain();
       // Optionally, use a ramp for smooth gain change:
       // gainNode.gain.setTargetAtTime(volume, audioContext.currentTime, 0.01);
       gainNode.gain.value = volume;
-      
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
       source.start(0);
     }
     
     // ================= UTILITY FUNCTIONS =================
+    function hexToLetter(hex) {
+      if(hex === "#E9625A") return "R";
+      if(hex === "#43A95D") return "G";
+      if(hex === "#4086D3") return "B";
+      if(hex === "#FDD538") return "Y";
+      return "";
+    }
+    
+    function letterToHex(letter) {
+      switch (letter) {
+        case "R": return "#E9625A";
+        case "G": return "#43A95D";
+        case "B": return "#4086D3";
+        case "Y": return "#FDD538";
+        default: return "#000000";
+      }
+    }
+    
+    // Generate dynamic objectives HTML (used by both dropdown and modal)
+    function generateObjectivesHTML() {
+      let html = '<h3>Objectives</h3><ul style="list-style:none; padding:0;">';
+      CONFIG.winConditions.forEach((condition, index) => {
+        html += `<li data-index="${index}">${condition.description} <span class="star objective-star" data-star-index="${index}">☆</span></li>`;
+      });
+      html += '</ul>';
+      return html;
+    }
+    
     function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
       const visited = new Set();
       const result = [];
@@ -602,7 +614,6 @@
     let selectedColor = null;
     let movesMade = 0;
     let history = [];
-    let starsAchieved = [false, false, false];
     
     // ================= GRID CREATION =================
     function createGrid() {
@@ -617,7 +628,7 @@
           tile.classList.add(letter);
           tile.dataset.row = i;
           tile.dataset.col = j;
-          // Only attach click events if not a blocked tile
+            // Only attach click events if not a blocked tile
           if(letter === "X") {
             tile.classList.add("blocked");
           } else {
@@ -633,33 +644,27 @@
     // ================= MOVE HANDLING =================
     function handleTileClick(e) {
       if (!selectedColor || movesMade >= CONFIG.maxMoves || isAnimating) return;
-      
       const row = parseInt(e.target.dataset.row);
       const col = parseInt(e.target.dataset.col);
       const targetLetter = currentGrid[row][col];
       if (targetLetter === selectedColor) return;
-      
       history.push({
         grid: JSON.parse(JSON.stringify(currentGrid)),
         moves: movesMade
       });
-      
       const tilesWithLevels = getConnectedTilesWithLevels(row, col, targetLetter);
       const groups = {};
       tilesWithLevels.forEach(({r, c, level}) => {
         if (!groups[level]) groups[level] = [];
         groups[level].push({r, c});
       });
-      
       movesMade++;
       document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
-      
       // Begin animation: block all other actions.
       isAnimating = true;
       const delayFactorMs = 100; // 0.1 sec per level
       const pendingAnimations = [];
       const startTime = performance.now();
-      
       for (const level in groups) {
         pendingAnimations.push({
           level: parseInt(level),
@@ -668,7 +673,6 @@
           played: false
         });
       }
-      
       function animateGroups(currentTime) {
         pendingAnimations.forEach(animation => {
           if (!animation.played && currentTime >= animation.scheduledTime) {
@@ -692,53 +696,94 @@
         } else {
           updateStars();
           updateScoreDisplay();
-          // End of animation - re-enable actions.
+            // End of animation - re-enable actions.
           isAnimating = false;
-          if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 3) {
+          if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 4) {
             showModal("Nah! Try Again!", false);
-          } else if (starsAchieved.filter(s => s).length === 3 && !autoWinModalShown) {
+          } else if (starsAchieved.filter(s => s).length === 4 && !autoWinModalShown) {
             showModal("Bravo! You won!", true);
             autoWinModalShown = true;
           }
         }
       }
-      
       requestAnimationFrame(animateGroups);
     }
     
     // ================= STAR & SCORE UPDATES =================
     function updateStars() {
       CONFIG.winConditions.forEach((condition, index) => {
-        // Ignore blocked tiles ("X") in the win condition check.
-        if (!starsAchieved[index] && movesMade <= condition.moves) {
-          if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
+        // Skip if already achieved
+        if (starsAchieved[index]) return;
+        // Check if every tile in the grid matches the condition color
+        if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
+          let starRating = "";
+          let starColor = "";
+          if (movesMade <= condition.optimal) {
+            starRating = "★";
+            starColor = "gold";
+          } else if (movesMade <= condition.silver) {
+            starRating = "★";
+            starColor = "silver";
+          } else if (movesMade <= condition.bronze) {
+            starRating = "★";
+            starColor = "peru";
+          }
+          if (starRating) {
             starsAchieved[index] = true;
-            const starElem = document.getElementById(`star-${index}`);
-            starElem.classList.add("achieved");
-            starElem.textContent = "★";
-            starElem.style.transform = "scale(1.5)";
-            setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
+            achievedColors[index] = starColor;
+            document.querySelectorAll(`.objective-star[data-star-index="${index}"]`).forEach(starElem => {
+              starElem.classList.add("achieved");
+              starElem.textContent = starRating;
+              starElem.style.color = starColor;
+              starElem.style.transform = "scale(1.5)";
+              setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
+            });
           }
         }
       });
     }
     
     function updateScoreDisplay() {
-      let achievedCount = starsAchieved.filter(s => s).length;
       let scoreHTML = "";
-      for (let i = 0; i < 3; i++) {
-        if (i < achievedCount) {
-          scoreHTML += '<span class="star achieved" style="font-size:1.4em; margin:0 2px;">★</span>';
+
+      CONFIG.scoringOrder.forEach((color, idx) => {
+        // The color bar below the star
+        const colorHex = letterToHex(color);
+
+        // Check if the star is achieved and which color it should have
+        if (starsAchieved[idx] && achievedColors[idx]) {
+          // Achieved star
+          scoreHTML += `
+            <div class="score-item" 
+                style="display:inline-block; text-align:center; margin:0 4px;">
+              <span class="star achieved" 
+                    style="font-size:1.4em; color:${achievedColors[idx]};">
+                ★
+              </span>
+              <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+            </div>`;
         } else {
-          scoreHTML += '<span class="star" style="font-size:1.4em; margin:0 2px;">☆</span>';
+          // Not achieved star
+          scoreHTML += `
+            <div class="score-item" 
+                style="display:inline-block; text-align:center; margin:0 4px;">
+              <span class="star" 
+                    style="font-size:1.4em; color:#ccc;">
+                ☆
+              </span>
+              <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+
+            </div>`;
         }
-      }
+      });
+
       document.getElementById('score').innerHTML = scoreHTML;
     }
+
     
     // ================= RESET & UNDO =================
     function resetGame() {
-      // Disallow reset during animation.
+      // Disallow reset during animation.        
       if(isAnimating) return;
       currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
       movesMade = 0;
@@ -759,9 +804,9 @@
         const col = i % CONFIG.initialGrid[0].length;
         const letter = currentGrid[row][col];
         if (letter === "X") {
-            tile.className = 'tile blocked X';
+          tile.className = 'tile blocked X';
         } else {
-            tile.className = 'tile ' + letter;
+          tile.className = 'tile ' + letter;
         }
       });
     }
@@ -770,18 +815,9 @@
     function showModal(message, isWin) {
       const modal = document.getElementById('modal');
       const modalHeader = document.getElementById('modal-header');
-      const modalObjectives = document.getElementById('modal-objectives');
-      
       modalHeader.textContent = message;
-      let objectivesHTML = '<h3>Objectives</h3><ul style="list-style:none; padding:0;">';
-      CONFIG.winConditions.forEach((condition, index) => {
-        const starHTML = starsAchieved[index]
-          ? '<span style="color:gold; text-shadow:2px 2px 4px rgba(0,0,0,0.7); font-size:1.2em;">★</span>'
-          : '<span style="color:#fff; font-size:1.2em;">☆</span>';
-        objectivesHTML += `<li style="margin-bottom:4px;">${condition.description} ${starHTML}</li>`;
-      });
-      objectivesHTML += '</ul>';
-      modalObjectives.innerHTML = objectivesHTML;
+      // Instead of regenerating, copy the objectives content from the dropdown.
+      document.getElementById('modal-objectives').innerHTML = document.getElementById('objectives-content').innerHTML;
       if (isWin) {
         document.getElementById('modal-more-puzzles').style.display = 'block';
         updateModalPagination();
@@ -798,7 +834,7 @@
     // ================= EVENT LISTENERS =================
     document.getElementById('score').addEventListener('click', () => {
       let achievedCount = starsAchieved.filter(s => s).length;
-      showModal(`Score: ${achievedCount}/3`, achievedCount === 3);
+      showModal(`Score: ${achievedCount}/4`, achievedCount === 4);
     });
     
     document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -818,7 +854,7 @@
         toggleArrow.textContent = '▼';
       }
     });
-    // How To Play Toggle
+    // How To Play Toggle 
     document.getElementById('toggle-arrow').addEventListener('click', () => {
       const content = document.getElementById('how-to-play-content');
       if (content.style.display === 'none' || content.style.display === '') {
@@ -829,7 +865,7 @@
         document.getElementById('toggle-arrow').textContent = '▼';
       }
     });
-    // ================= PAGINATION =================
+    // ================= PAGINATION =================    
     function updatePagePagination() {
       const pagePagination = document.getElementById("page-pagination");
       const currentPage = CONFIG.pagination.currentPage;
@@ -867,11 +903,14 @@
     }
     
     // ================= INITIALIZATION =================
+    // Populate objectives dropdown dynamically
+    document.getElementById('objectives-content').innerHTML = generateObjectivesHTML();
     resetGame();
     createGrid();
     updatePagePagination();
     updateScoreDisplay();
     
+    // Attach color button event listeners
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         // Disallow changing color during animation.
@@ -887,24 +926,14 @@
       btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
     });
     
-    // Helper: Convert hex to letter for selectedColor.
-    function hexToLetter(hex) {
-      if(hex === "#E9625A") return "R";
-      if(hex === "#43A95D") return "G";
-      if(hex === "#4086D3") return "B";
-      if(hex === "#FDD538") return "Y";
-      return "";
+    // Attach undo event listeners based on configuration
+    if (CONFIG.showUndo) {
+      document.getElementById('undo').style.display = 'inline-block';
+      document.getElementById('undo').addEventListener('click', undoMove);
+      document.getElementById('undo').addEventListener('touchstart', (e) => { e.preventDefault(); undoMove(); });
+    } else {
+      document.getElementById('undo').style.display = 'none';
     }
-    
-    // Undo event listener (commented-out sections preserved)
-    // document.getElementById('undo').addEventListener('click', undoMove);
-    // document.getElementById('undo').addEventListener('touchstart', (e) => {
-    //    e.preventDefault();
-    //    undoMove();
-    // });
-    
-  
-    
   </script>
 </body>
 </html>
