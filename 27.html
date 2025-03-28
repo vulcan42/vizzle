@@ -425,6 +425,7 @@
       <span id="objectives-toggle" class="toggle-arrow">▼</span>
     </div>
     <p class="objectives-description">
+    </p>
     <!-- Objectives content will be generated dynamically -->
     <div id="objectives-content"></div>
   </div>
@@ -715,7 +716,7 @@
         // Skip if already achieved
         if (starsAchieved[index]) return;
         // Check if every tile in the grid matches the condition color
-        if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
+        if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
           let starRating = "";
           let starColor = "";
           if (movesMade <= condition.optimal) {
