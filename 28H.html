@@ -492,27 +492,27 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
-        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
-        ["B", "R", "X", "R", "R", "R", "G", "B"],
-        ["Y", "R", "G", "B", "G", "R", "G", "Y"],
-        ["B", "R", "G", "B", "G", "R", "G", "B"],
-        ["B", "R", "G", "R", "B", "R", "G", "B"],
-        ["Y", "R", "G", "R", "B", "R", "G", "Y"],
-        ["B", "R", "G", "G", "G", "X", "G", "B"],
-        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
-        ["B", "B", "Y", "B", "B", "Y", "B", "B"]
+        ["X", "G", "B", "Y", "R", "G", "B", "Y"],
+        ["R", "X", "B", "Y", "R", "G", "B", "Y"],
+        ["R", "G", "X", "Y", "R", "G", "B", "Y"],
+        ["R", "G", "B", "X", "R", "G", "B", "Y"],
+        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
+        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
+        ["R", "G", "B", "Y", "X", "G", "B", "Y"],
+        ["R", "G", "B", "Y", "R", "X", "B", "Y"],
+        ["R", "G", "B", "Y", "R", "G", "X", "Y"],
+        ["R", "G", "B", "Y", "R", "G", "B", "X"]
       ],
-      maxMoves: 8,
+      maxMoves: 11,
       winConditions: [
-        { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (min. 6 moves)" },
-        { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (min. 6 moves)" },
-        { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (min. 6 moves)" },
-        { color: "Y", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Yellow 🟨 (min. 5 moves)" }
+        { color: "R", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Red 🟥 (Best - 7 moves)" },
+        { color: "G", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Green 🟩 (Best - 7 moves)" },
+        { color: "B", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Blue 🟦 (Best - 7 moves)" },
+        { color: "Y", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Yellow 🟨 (Best - 7 moves)" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 27,
+        currentPage: 28,
         maxPage: 28,
         showPrev: true,
         showNext: true,
