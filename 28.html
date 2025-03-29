@@ -712,37 +712,44 @@
     
     // ================= STAR & SCORE UPDATES =================
     function updateStars() {
-      CONFIG.winConditions.forEach((condition, index) => {
-        // Skip if already achieved
-        if (starsAchieved[index]) return;
-        // Check if every tile in the grid matches the condition color
-        if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
-          let starRating = "";
-          let starColor = "";
-          if (movesMade <= condition.optimal) {
-            starRating = "★";
-            starColor = "gold";
-          } else if (movesMade <= condition.silver) {
-            starRating = "★";
-            starColor = "silver";
-          } else if (movesMade <= condition.bronze) {
-            starRating = "★";
-            starColor = "peru";
-          }
-          if (starRating) {
-            starsAchieved[index] = true;
-            achievedColors[index] = starColor;
-            document.querySelectorAll(`.objective-star[data-star-index="${index}"]`).forEach(starElem => {
-              starElem.classList.add("achieved");
-              starElem.textContent = starRating;
-              starElem.style.color = starColor;
-              starElem.style.transform = "scale(1.5)";
-              setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
-            });
-          }
+    CONFIG.winConditions.forEach((condition, index) => {
+        // Determine current rating (0 if not achieved)
+        let currentRating = 0;
+        if (achievedColors[index] === "gold") currentRating = 3;
+        else if (achievedColors[index] === "silver") currentRating = 2;
+        else if (achievedColors[index] === "peru") currentRating = 1;
+        
+        // Check if the grid meets the win condition (you might want to ignore blocked cells if needed)
+        if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
+        // Determine new rating based on movesMade
+        let newRating = 0;
+        let newStarColor = "";
+        if (movesMade <= condition.optimal) {
+            newRating = 3;
+            newStarColor = "gold";
+        } else if (movesMade <= condition.silver) {
+            newRating = 2;
+            newStarColor = "silver";
+        } else if (movesMade <= condition.bronze) {
+            newRating = 1;
+            newStarColor = "peru";
         }
-      });
+        // Only update if the new rating is better than the current rating
+        if (newRating > currentRating) {
+            starsAchieved[index] = true;  // remains true once any rating is achieved
+            achievedColors[index] = newStarColor;
+            document.querySelectorAll(`.objective-star[data-star-index="${index}"]`).forEach(starElem => {
+            starElem.classList.add("achieved");
+            starElem.textContent = "★";
+            starElem.style.color = newStarColor;
+            starElem.style.transform = "scale(1.5)";
+            setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
+            });
+        }
+        }
+    });
     }
+
     
     function updateScoreDisplay() {
       let scoreHTML = "";
