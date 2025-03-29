@@ -720,8 +720,8 @@
         else if (achievedColors[index] === "peru") currentRating = 1;
         
         // Check if the grid meets the win condition (you might want to ignore blocked cells if needed)
-        if (currentGrid.every(row => row.every(cell => cell === condition.color))) {
-        // Determine new rating based on movesMade
+        if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
+          // Determine new rating based on movesMade
         let newRating = 0;
         let newStarColor = "";
         if (movesMade <= condition.optimal) {
