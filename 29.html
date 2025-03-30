@@ -492,27 +492,27 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "G", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "B", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"],
-        ["R", "G", "B", "Y", "R", "G", "B", "Y"]
+        ["B", "B", "B", "R", "R", "B", "B", "B"],
+        ["B", "B", "R", "G", "G", "R", "B", "B"],
+        ["B", "R", "Y", "G", "G", "Y", "R", "B"],
+        ["R", "B", "Y", "G", "G", "Y", "B", "R"],
+        ["B", "B", "Y", "G", "G", "Y", "B", "B"],
+        ["G", "G", "R", "B", "B", "R", "G", "G"],
+        ["Y", "G", "R", "B", "B", "R", "G", "Y"],
+        ["G", "Y", "R", "B", "B", "R", "Y", "G"],
+        ["G", "G", "Y", "B", "B", "Y", "G", "G"],
+        ["G", "G", "G", "Y", "Y", "G", "G", "G"]
       ],
-      maxMoves: 8,
+      maxMoves: 10,
       winConditions: [
-        { color: "R", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Red 🟥 (Best - 5 moves)" },
-        { color: "G", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Green 🟩 (Best - 5 moves)" },
-        { color: "B", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Blue 🟦 (Best - 5 moves)" },
-        { color: "Y", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Yellow 🟨 (Best - 5 moves)" }
+        { color: "R", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Red 🟥 (Best - 7 moves)" },
+        { color: "G", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Green 🟩 (Best - 7 moves)" },
+        { color: "B", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Blue 🟦 (Best - 7 moves)" },
+        { color: "Y", optimal: 7, silver: 8, bronze: 9, description: "Turn all tiles to Yellow 🟨 (Best - 7 moves)" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 28,
+        currentPage: 29,
         maxPage: 29,
         showPrev: true,
         showNext: true,
@@ -699,12 +699,13 @@
           updateScoreDisplay();
             // End of animation - re-enable actions.
           isAnimating = false;
-          if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < 4) {
+            if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < CONFIG.winConditions.length) {
             showModal("Nah! Try Again!", false);
-          } else if (starsAchieved.filter(s => s).length === 4 && !autoWinModalShown) {
+            } else if (starsAchieved.filter(s => s).length === CONFIG.winConditions.length && !autoWinModalShown) {
             showModal("Bravo! You won!", true);
             autoWinModalShown = true;
-          }
+            }
+
         }
       }
       requestAnimationFrame(animateGroups);
@@ -749,44 +750,40 @@
         }
     });
     }
-
     
     function updateScoreDisplay() {
-      let scoreHTML = "";
-
-      CONFIG.scoringOrder.forEach((color, idx) => {
-        // The color bar below the star
-        const colorHex = letterToHex(color);
-
-        // Check if the star is achieved and which color it should have
-        if (starsAchieved[idx] && achievedColors[idx]) {
-          // Achieved star
-          scoreHTML += `
-            <div class="score-item" 
-                style="display:inline-block; text-align:center; margin:0 4px;">
-              <span class="star achieved" 
-                    style="font-size:1.4em; color:${achievedColors[idx]};">
-                ★
-              </span>
-              <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
-            </div>`;
-        } else {
-          // Not achieved star
-          scoreHTML += `
-            <div class="score-item" 
-                style="display:inline-block; text-align:center; margin:0 4px;">
-              <span class="star" 
-                    style="font-size:1.4em; color:#ccc;">
-                ☆
-              </span>
-              <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
-
-            </div>`;
-        }
-      });
-
-      document.getElementById('score').innerHTML = scoreHTML;
+        let scoreHTML = "";
+        // Loop over the active win conditions
+        CONFIG.winConditions.forEach((condition, idx) => {
+            const color = condition.color; // Get the color directly from the condition
+            const colorHex = letterToHex(color);
+            if (starsAchieved[idx] && achievedColors[idx]) {
+            // Achieved star
+            scoreHTML += `
+                <div class="score-item" 
+                    style="display:inline-block; text-align:center; margin:0 4px;">
+                <span class="star achieved" 
+                        style="font-size:1.4em; color:${achievedColors[idx]};">
+                    ★
+                </span>
+                <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+                </div>`;
+            } else {
+            // Not achieved star
+            scoreHTML += `
+                <div class="score-item" 
+                    style="display:inline-block; text-align:center; margin:0 4px;">
+                <span class="star" 
+                        style="font-size:1.4em; color:#ccc;">
+                    ☆
+                </span>
+                <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+                </div>`;
+            }
+        });
+        document.getElementById('score').innerHTML = scoreHTML;
     }
+
 
     
     // ================= RESET & UNDO =================
@@ -842,7 +839,7 @@
     // ================= EVENT LISTENERS =================
     document.getElementById('score').addEventListener('click', () => {
       let achievedCount = starsAchieved.filter(s => s).length;
-      showModal(`Score: ${achievedCount}/4`, achievedCount === 4);
+      showModal(`Score: ${achievedCount}/${CONFIG.winConditions.length}`, achievedCount === CONFIG.winConditions.length);
     });
     
     document.getElementById('modal-close').addEventListener('click', closeModal);
