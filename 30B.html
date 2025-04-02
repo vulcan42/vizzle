@@ -524,9 +524,10 @@
       showUndo: false
     };
     
-    // Define a unique puzzle identifier using the full value from pagination.
-    // For 30.html, this will be "30"; for a bonus puzzle like 30B.html, it will be "30B".
-    const puzzleId = CONFIG.pagination.currentPage.toString();
+    // Instead of using CONFIG.pagination.currentPage,
+    // extract the file name from the URL and remove the .html extension.
+    const fileName = window.location.pathname.split('/').pop(); // e.g. "30B.html" or "30.html"
+    const puzzleId = fileName.replace('.html', ''); // yields "30B" or "30"
 
     // Helper function to generate unique localStorage keys for this puzzle.
     function getStorageKey(key) {
