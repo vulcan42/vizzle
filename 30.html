@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Paint it Full</title>
+  <title>Paint it All</title>
   <style>
     /* Global Styles */
     * {
@@ -416,7 +416,7 @@
 </head>
 <body>
   <!-- Title -->
-  <h1>Paint it Full</h1>
+  <h1>Paint it All</h1>
   
   <!-- Objectives Dropdown -->
   <div id="objectives-dropdown" class="objectives-dropdown">
@@ -492,27 +492,27 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["B", "B", "B", "R", "R", "B", "B", "B"],
-        ["B", "B", "R", "G", "G", "R", "B", "B"],
-        ["B", "R", "Y", "G", "G", "Y", "R", "B"],
-        ["R", "B", "Y", "G", "G", "Y", "B", "R"],
-        ["B", "B", "Y", "G", "G", "Y", "B", "B"],
-        ["G", "G", "R", "B", "B", "R", "G", "G"],
-        ["Y", "G", "R", "B", "B", "R", "G", "Y"],
-        ["B", "Y", "R", "B", "B", "R", "Y", "B"],
-        ["B", "B", "Y", "B", "B", "Y", "B", "B"],
-        ["B", "B", "B", "Y", "Y", "B", "B", "B"]
+        ["B", "B", "G", "B", "B", "B", "B", "B"],
+        ["B", "B", "B", "G", "B", "B", "B", "B"],
+        ["R", "R", "R", "R", "Y", "R", "R", "R"],
+        ["B", "R", "B", "B", "Y", "Y", "B", "B"],
+        ["R", "B", "B", "B", "Y", "G", "Y", "B"],
+        ["G", "R", "B", "R", "G", "G", "G", "Y"],
+        ["G", "G", "R", "R", "G", "G", "Y", "G"],
+        ["Y", "Y", "Y", "R", "Y", "Y", "Y", "Y"],
+        ["G", "G", "G", "G", "B", "G", "G", "G"],
+        ["G", "G", "G", "G", "G", "B", "G", "G"]
       ],
       maxMoves: 10,
       winConditions: [
         { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
-        // { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
+        { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
         { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
-        // { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
+        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 29,
+        currentPage: 30,
         maxPage: 30,
         showPrev: true,
         showNext: true,
@@ -520,7 +520,7 @@
         nextText: "⏩<br><em>Next</em>"
       },
       // Toggle for displaying the Undo button
-      showUndo: false
+      showUndo: true
     };
     
     let autoWinModalShown = false;
@@ -528,7 +528,64 @@
     // Global arrays to track achievement status and colors
     let starsAchieved = [false, false, false, false];
     let achievedColors = [null, null, null, null];
-    
+
+    // Local Storage Persistence for Achievements
+    const ACHIEVEMENTS_KEY = "paintItFullAchievements";
+
+    // Load saved achievements (starsAchieved and achievedColors) from localStorage
+    function loadAchievements() {
+      const saved = localStorage.getItem(ACHIEVEMENTS_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (Array.isArray(data.starsAchieved) && Array.isArray(data.achievedColors)) {
+            starsAchieved = data.starsAchieved;
+            achievedColors = data.achievedColors;
+          }
+        } catch (err) {
+          console.error("Error parsing achievements from localStorage", err);
+        }
+      }
+    }
+
+    // Save the current achievements info to localStorage
+    function updateAchievementsStorage() {
+      const data = {
+        starsAchieved: starsAchieved,
+        achievedColors: achievedColors
+      };
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(data));
+    }
+
+    // Load achievements on game initialization
+    loadAchievements();
+
+    // --- New Code for Reset Counter and Free Reset Flag ---
+    // Keys for storing reset counter and free reset flag in localStorage
+    const RESET_COUNTER_KEY = "paintItFullResetCounter";
+    const FREE_RESET_KEY = "paintItFullFreeReset";
+
+    // Initialize reset counter and free reset flag from localStorage (or default if not present)
+    let resetCounter = parseInt(localStorage.getItem(RESET_COUNTER_KEY)) || 0;
+    let freeResetAvailable = localStorage.getItem(FREE_RESET_KEY) === "true" || false;
+
+    // Helper function to update reset counter and free reset flag in localStorage
+    function updateResetStorage() {
+      localStorage.setItem(RESET_COUNTER_KEY, resetCounter);
+      localStorage.setItem(FREE_RESET_KEY, freeResetAvailable);
+    }
+
+    // --- New Code for Persistent Undo Toggle ---
+    // Set the threshold for enabling undo and a key to store its enabled status
+    const UNDO_THRESHOLD = 30;
+    const UNDO_ENABLED_KEY = "paintItFullUndoEnabled";
+
+    // Initialize undo flag from localStorage; if set, update CONFIG.showUndo
+    let undoEnabled = localStorage.getItem(UNDO_ENABLED_KEY) === "true";
+    if (undoEnabled) {
+      CONFIG.showUndo = true;
+    }
+        
     // ================= WEB AUDIO API SETUP =================
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     let popBuffer = null;
@@ -746,6 +803,12 @@
             starElem.style.transform = "scale(1.5)";
             setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
             });
+            // Update localStorage to persist the new achievements state
+            updateAchievementsStorage();
+
+            // --- New: Grant a free reset when a new achievement is attained ---
+            freeResetAvailable = true;
+            updateResetStorage();
         }
         }
     });
@@ -784,12 +847,52 @@
         document.getElementById('score').innerHTML = scoreHTML;
     }
 
+    // Function to update the objectives dropdown stars based on persisted achievements
+    function updateObjectivesStars() {
+      // Iterate over each star element in the objectives dropdown
+      document.querySelectorAll('.objective-star').forEach((starElem) => {
+        const idx = starElem.getAttribute('data-star-index');
+        // Use the persisted achievements values (starsAchieved and achievedColors)
+        if (starsAchieved[idx] && achievedColors[idx]) {
+          starElem.classList.add("achieved");
+          starElem.textContent = "★";
+          starElem.style.color = achievedColors[idx];
+        } else {
+          starElem.classList.remove("achieved");
+          starElem.textContent = "☆";
+          starElem.style.color = "#fff"; // or your default color for unachieved stars
+        }
+      });
+    }
+
 
     
     // ================= RESET & UNDO =================
     function resetGame() {
       // Disallow reset during animation.        
       if(isAnimating) return;
+      
+      // --- New: Handle reset counter and free reset logic ---
+      if (freeResetAvailable) {
+        // Consume the free reset without incrementing the counter.
+        freeResetAvailable = false;
+      } else {
+        // Increment reset counter if no free reset is available.
+        resetCounter++;
+      }
+      updateResetStorage();
+
+      // --- New: Check if reset counter reached threshold to enable undo permanently ---
+      if (resetCounter >= UNDO_THRESHOLD && !undoEnabled) {
+        undoEnabled = true;
+        CONFIG.showUndo = true;
+        localStorage.setItem(UNDO_ENABLED_KEY, "true");
+        // Optionally attach undo event listeners if they aren't already attached:
+        document.getElementById('undo').style.display = 'inline-block';
+        document.getElementById('undo').addEventListener('click', undoMove);
+        document.getElementById('undo').addEventListener('touchstart', (e) => { e.preventDefault(); undoMove(); });
+      }
+      
       currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
       movesMade = 0;
       history = [];
@@ -910,6 +1013,9 @@
     // ================= INITIALIZATION =================
     // Populate objectives dropdown dynamically
     document.getElementById('objectives-content').innerHTML = generateObjectivesHTML();
+    // Update objective stars based on persisted achievements data
+    updateObjectivesStars();
+
     resetGame();
     createGrid();
     updatePagePagination();
