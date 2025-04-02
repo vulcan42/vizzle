@@ -523,14 +523,23 @@
       showUndo: true
     };
     
+    // Define a unique puzzle identifier using the full value from pagination.
+    // For 30.html, this will be "30"; for a bonus puzzle like 30B.html, it will be "30B".
+    const puzzleId = CONFIG.pagination.currentPage.toString();
+
+    // Helper function to generate unique localStorage keys for this puzzle.
+    function getStorageKey(key) {
+        return puzzleId + "_" + key;
+    }
+
     let autoWinModalShown = false;
     let isAnimating = false;
     // Global arrays to track achievement status and colors
     let starsAchieved = [false, false, false, false];
     let achievedColors = [null, null, null, null];
 
-    // Local Storage Persistence for Achievements
-    const ACHIEVEMENTS_KEY = "paintItFullAchievements";
+    // Local Storage Persistence for Achievements using the puzzle-specific key
+    const ACHIEVEMENTS_KEY = getStorageKey("paintItFullAchievements");
 
     // Load saved achievements (starsAchieved and achievedColors) from localStorage
     function loadAchievements() {
@@ -560,10 +569,9 @@
     // Load achievements on game initialization
     loadAchievements();
 
-    // --- New Code for Reset Counter and Free Reset Flag ---
-    // Keys for storing reset counter and free reset flag in localStorage
-    const RESET_COUNTER_KEY = "paintItFullResetCounter";
-    const FREE_RESET_KEY = "paintItFullFreeReset";
+    // --- New Code for Reset Counter and Free Reset Flag using namespaced keys ---
+    const RESET_COUNTER_KEY = getStorageKey("paintItFullResetCounter");
+    const FREE_RESET_KEY = getStorageKey("paintItFullFreeReset");
 
     // Initialize reset counter and free reset flag from localStorage (or default if not present)
     let resetCounter = parseInt(localStorage.getItem(RESET_COUNTER_KEY)) || 0;
@@ -575,10 +583,10 @@
       localStorage.setItem(FREE_RESET_KEY, freeResetAvailable);
     }
 
-    // --- New Code for Persistent Undo Toggle ---
+    // --- New Code for Persistent Undo Toggle using a namespaced key ---
     // Set the threshold for enabling undo and a key to store its enabled status
     const UNDO_THRESHOLD = 30;
-    const UNDO_ENABLED_KEY = "paintItFullUndoEnabled";
+    const UNDO_ENABLED_KEY = getStorageKey("paintItFullUndoEnabled");
 
     // Initialize undo flag from localStorage; if set, update CONFIG.showUndo
     let undoEnabled = localStorage.getItem(UNDO_ENABLED_KEY) === "true";
