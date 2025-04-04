@@ -492,28 +492,29 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["B", "B", "G", "B", "B", "B", "B", "B"],
-        ["B", "B", "B", "G", "B", "B", "B", "B"],
-        ["R", "R", "R", "R", "Y", "R", "R", "R"],
-        ["B", "R", "B", "B", "B", "Y", "B", "B"],
-        ["R", "B", "B", "R", "B", "B", "Y", "B"],
-        ["B", "R", "B", "G", "Y", "B", "B", "Y"],
-        ["B", "B", "R", "B", "B", "B", "Y", "B"],
-        ["Y", "Y", "Y", "R", "Y", "Y", "Y", "Y"],
-        ["G", "G", "G", "G", "B", "G", "G", "G"],
-        ["G", "G", "G", "G", "G", "B", "G", "G"]
+        ["R", "R", "R", "B", "X", "B", "B", "B"],
+        ["R", "Y", "R", "B", "Y", "B", "G", "B"],
+        ["R", "R", "R", "B", "X", "B", "B", "B"],
+        ["B", "G", "G", "G", "B", "X", "X", "G"],
+        ["B", "G", "Y", "G", "B", "B", "B", "G"],
+        ["B", "G", "G", "G", "Y", "Y", "Y", "G"],
+        ["B", "B", "B", "B", "Y", "R", "Y", "G"],
+        ["G", "G", "G", "B", "Y", "Y", "Y", "B"],
+        ["G", "B", "G", "R", "B", "B", "B", "B"],
+        ["G", "G", "G", "R", "B", "B", "B", "B"]
+
+
       ],
-      maxMoves: 9,
+      maxMoves: 10,
       winConditions: [
-        //{ color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
-        //{ color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
-        { color: "B", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Blue 🟦 (Best - 5 moves)" },
-        //{ color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
+        // { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
+        // { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
+        { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
+        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
       ],
-      
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 30,
+        currentPage: 31,
         maxPage: 31,
         showPrev: true,
         showNext: true,
@@ -528,6 +529,7 @@
     // extract the file name from the URL and remove the .html extension.
     const fileName = window.location.pathname.split('/').pop(); // e.g. "30B.html" or "30.html"
     const puzzleId = fileName.replace('.html', ''); // yields "30B" or "30"
+
 
     // Helper function to generate unique localStorage keys for this puzzle.
     function getStorageKey(key) {
@@ -769,9 +771,15 @@
             if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < CONFIG.winConditions.length) {
             showModal("Nah! Try Again!", false);
             } else if (starsAchieved.filter(s => s).length === CONFIG.winConditions.length && !autoWinModalShown) {
-            showModal("Bravo! You won!", true);
-            autoWinModalShown = true;
+                const gridSolved = CONFIG.winConditions.some(condition =>
+                    currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))
+                );
+                if (gridSolved) {
+                    showModal("Bravo! You won!", true);
+                    autoWinModalShown = true;
+                }
             }
+
 
         }
       }
@@ -855,6 +863,19 @@
             }
         });
         document.getElementById('score').innerHTML = scoreHTML;
+    }
+
+    // New function: Check if the grid is solved on page load and show win modal as a reminder
+    function checkForWinOnPageOpen() {
+        if (starsAchieved.filter(s => s).length === CONFIG.winConditions.length && !autoWinModalShown) {
+            const gridSolved = CONFIG.winConditions.some(condition =>
+                currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))
+            );
+            if (gridSolved) {
+                showModal("Bravo! You won!", true);
+                autoWinModalShown = true;
+            }
+        }
     }
 
     // Function to update the objectives dropdown stars based on persisted achievements
@@ -1030,6 +1051,7 @@
     createGrid();
     updatePagePagination();
     updateScoreDisplay();
+    checkForWinOnPageOpen();
     
     // Attach color button event listeners
     document.querySelectorAll('.color-btn').forEach(btn => {
