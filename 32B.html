@@ -492,29 +492,29 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "R", "R", "B", "X", "B", "B", "B"],
-        ["R", "Y", "R", "B", "Y", "B", "G", "B"],
-        ["R", "R", "R", "B", "X", "B", "B", "B"],
-        ["B", "G", "G", "G", "B", "X", "X", "G"],
-        ["B", "G", "Y", "G", "B", "B", "B", "G"],
-        ["B", "G", "G", "G", "Y", "Y", "Y", "G"],
-        ["B", "B", "B", "B", "Y", "R", "Y", "G"],
-        ["G", "G", "G", "B", "Y", "Y", "Y", "B"],
-        ["G", "B", "G", "R", "B", "B", "B", "B"],
-        ["G", "G", "G", "R", "B", "B", "B", "B"]
+        ["R", "R", "R", "G", "B", "B", "B", "R"],
+        ["R", "R", "R", "Y", "B", "B", "B", "R"],
+        ["R", "R", "R", "Y", "B", "B", "B", "R"],
+        ["B", "B", "B", "X", "G", "G", "G", "G"],
+        ["R", "R", "R", "Y", "B", "R", "Y", "Y"],
+        ["B", "B", "R", "G", "B", "R", "Y", "Y"],
+        ["B", "B", "R", "Y", "B", "R", "R", "R"],
+        ["G", "G", "G", "Y", "Y", "B", "B", "B"],
+        ["B", "B", "G", "R", "R", "B", "G", "G"],
+        ["B", "B", "G", "R", "R", "B", "G", "G"]
 
 
       ],
       maxMoves: 10,
       winConditions: [
-        // { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
-        // { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
+      // { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
+        { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
         { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
         { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 31,
+        currentPage: 32,
         maxPage: 32,
         showPrev: true,
         showNext: true,
