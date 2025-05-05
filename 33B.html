@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Paint it All</title>
+  <script src="https://kit.fontawesome.com/733857cba7.js" crossorigin="anonymous"></script>
   <style>
     /* Global Styles */
     * {
@@ -25,43 +26,74 @@
       touch-action: manipulation;
       min-height: 100vh;
     }
-    h1 {
-      color: #73A9D8;
-      margin: 10px 0 5px 0;
-      font-size: 2.5em;
+    h1#game-title {
+      font-size: 1.5em;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      text-align: center;
+      text-align: left;
     }
+    /* Header bar: title + help icon */
+    #header-bar {
+      width: 90%;
+      max-width: 480px;
+      margin: 5px auto 0;
+      display: flex;
+      align-items: center;
+      /* no longer justify-content: space-between—buttons are grouped */
+    }
+    #header-bar h1 {
+      flex: 1;               /* fill remaining space */
+      margin: 0;             /* remove old auto-centering margins */
+      font-size: 1.7em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 8px;              /* space between icons */
+    }
+    .help-button {
+      background: transparent;
+      border: 1px solid #fff; /* default white for help */
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;            /* default white for help */
+      font-size: 0.7em;
+      cursor: pointer;
+      padding: 0;
+    }
+    /* Objectives icon—transparent ring, same size as help-button */
+    #objectives-button {
+      /* match the help-button’s border-box sizing */
+      width: 20px;
+      height: 20px;
+      border: 1px solid transparent;  /* preserve 1px “ring” for consistent box-sizing */
+      border-radius: 50%;
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* match the help-button’s glyph sizing */
+      font-size: 1.2em;
+      color: #FDD538;
+      
+      padding: 0;
+    }
+    .help-button i {
+      pointer-events: none;
+    }
+
     /* Objectives Dropdown */
     .objectives-dropdown {
       width: 100%;
       max-width: 480px;
-      margin: 10px 10px;
+      margin: 2px 2px;
       color: #fff;
       font-size: 0.9em;
-    }
-    .objectives-description {
-      font-size: 0.95em;
-      color: #fff;
-      margin: 5px 20px;
-    }
-    #objectives-header h2 {
-      margin: 0;
-      font-size: 1.1em;
-      padding: 5px 0px 5px 20px;
-    }
-    #objectives-header {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-    .toggle-arrow { 
-      font-size: 1em; 
-      margin-left: 5px;
-      color: #E3E846;
-    }
-    .toggle-arrow-text {
-      color: #E3E846;
     }
     #objectives-content {
       display: none;
@@ -81,19 +113,10 @@
     .how-to-play-dropdown {
       width: 100%;
       max-width: 480px;
-      margin: 10px 10px 0px;
+      margin: 2px 2px;
       color: #fff;
-      font-size: 0.95em;
+      font-size: 0.9em;
       text-align: left;
-    }
-    .how-to-play-header {
-      color: #fff;
-      text-align: left;
-      margin: 0 0 8px 20px;
-      line-height: 1.4;
-      font-size: 0.95em;
-      width: 100%;
-      max-width: 480px;
     }
     .how-to-play-content {
       display: none;
@@ -101,10 +124,18 @@
       padding-left: 20px;
       border-left: 2px solid #fff;
     }
+
+    .inner-toggle {
+      color: #FDD538;       /* project yellow */
+      cursor: pointer;
+      margin-left: 4px;     /* a little breathing room */
+      font-size: 1em;
+    }
+
     /* Your Score Section */
     #score-section {
       text-align: center;
-      margin: 10px 0;
+      margin: 15px 0;
       color: #fff;
       font-size: 1.2em;
     }
@@ -165,35 +196,85 @@
     }
     /* Undo button: will be shown or hidden based on CONFIG.showUndo */
     #undo {
-      background: transparent;
-      border: 1px solid #fff;
-      border-radius: 50%;
       width: 24px;
       height: 24px;
-      font-size: 13px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      transform: rotate(-90deg);
-      color: #fff;
     }
-    /* Color Picker */
-    .color-picker {
+
+    #undo i {
+      pointer-events: none;
+      display: block;
+      width: 100%;
+      text-align: center;
+      font-size: 0.85em; /* keep your chosen size */
+    }
+
+    /* Wrapper that holds the pill and reset button */
+    #controls-wrapper {
+      width: 90%;
+      max-width: 480px;
+      margin: 8px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;   /* pushes reset to the far right */
+    }
+
+    /* The pill container around only the swatches */
+    #swatch-pill {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    /* Swatches inside the pill */
+    #swatch-pill .color-picker {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
     }
-    .color-btn {
+    #swatch-pill .color-btn {
       width: 40px;
       height: 40px;
       border: none;
       border-radius: 50%;
-      transition: transform 0.1s;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
     }
-    .color-btn.selected {
+    #swatch-pill .color-btn.selected {
       transform: scale(1.2);
       box-shadow: 0 0 8px rgba(255,255,255,0.5);
+      border: 2px solid #fff;
     }
+
+    .reset-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;                   /* space between text & icon */
+      padding: 8px 12px;          /* more horizontal room */
+      background: transparent;
+      border: 2px solid #fff;     /* longer border now wraps text+icon */
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.95em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);  /* stronger click affordance */
+      cursor: pointer;
+    }
+    .reset-button span {
+      line-height: 1;             /* ensure text centers vertically */
+    }
+    .reset-button i {
+      pointer-events: none;
+    }
+
     /* More Puzzles Section */
     #page-pagination {
       width: 100%;
@@ -218,15 +299,7 @@
       padding: 5px;
     }
     #page-pagination a:hover { opacity: 0.8; }
-    .reset-container button#reset {
-      background: #73A9D8;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 12px 24px;
-      font-size: 1.1em;
-      transition: opacity 0.2s;
-    }
+
     /* Modal Styles */
     .modal {
       position: fixed;
@@ -251,6 +324,72 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
       text-align: center;
     }
+    /* ==== Objective-Modal: text left, star right, star color = black ==== */
+    #modal-objectives ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    #modal-objectives li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75em;
+      /* ensures text sits left, icon sits right */
+    }
+    #modal-objectives li:last-child {
+      margin-bottom: 0;
+    }
+    /* 1. Only un-achieved stars stay black */
+    #modal-objectives .objective-star:not(.achieved) {
+      color: #000;
+    }
+
+    /* 2. Give every star the same font-size & line-height */
+    #modal-objectives .objective-star {
+      font-size: 1.2em;
+      line-height: 1;
+    }
+
+    /* 1. Left-align any <h3> inside the modal-objectives (win/loss/score) */
+      #modal-objectives h3 {
+      text-align: left;
+      margin-bottom: 0.5em;
+    }
+
+    #modal-objectives {
+      margin-bottom: 1.5em;
+    }
+
+    /* 2. Shrink the “?” button and force a black border in the Welcome & Score modal sections */
+    #modal-welcome-howto .help-button,
+    #modal-score-howto .help-button {
+      display: flex;               /* turn on flex centering */
+      align-items: center;         /* vertical centre */
+      justify-content: center;     /* horizontal centre */
+      box-sizing: border-box;      /* include border in size */
+      width: 1.4em;                /* slightly larger if you like */
+      height: 1.4em;               /* same as width for a square */
+      border: 1px solid #000;      /* black outline */
+      padding: 0;                  /* drop the old padding */
+    }
+
+    #modal-welcome-howto .help-button i,
+    #modal-score-howto .help-button i {
+      font-size: 1em;              /* full container height for icon */
+      line-height: 1;
+      color: #000;              /* no extra leading */
+    }
+
+    /* 3. Left-align the How-to-Play content inside the welcome modal */
+    #welcome-howto-content {
+      text-align: left;
+    }
+
+    #score-howto-content {
+      text-align: left;
+    }
+
     .close-button {
       position: absolute;
       top: 10px;
@@ -415,27 +554,35 @@
   </style>
 </head>
 <body>
-  <!-- Title -->
-  <h1>Paint it All</h1>
-  
+  <!-- Header Bar: Title + Action Icons -->
+  <div id="header-bar">
+    <h1 id="game-title">
+      <span style="color:#E9625A">Pa</span><span style="color:#FFFFFF">i</span><span style="color:#4086D3">nt</span>
+      <span> </span>
+      <span style="color:#FFFFFF">it</span>
+      <span> </span>
+      <span style="color:#43A95D">A</span><span style="color:#FDD538">ll</span>
+    </h1>
+    <div class="header-buttons">
+      <button id="objectives-button" class="help-button" aria-label="Objectives">
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </button>
+      <button id="help-button" class="help-button" aria-label="How to play">
+        <i class="fa-solid fa-question"></i>
+      </button>
+    </div>
+  </div>
   <!-- Objectives Dropdown -->
   <div id="objectives-dropdown" class="objectives-dropdown">
-    <div id="objectives-header">
-      <h2>Objectives</h2>
-      <span id="objectives-toggle" class="toggle-arrow">▼</span>
-    </div>
-    <p class="objectives-description">
-    </p>
     <!-- Objectives content will be generated dynamically -->
-    <div id="objectives-content"></div>
+    <div id="objectives-content" class="how-to-play-content"></div>
   </div>
   
   <!-- How To Play Section -->
   <div class="how-to-play-dropdown">
-    <span class="how-to-play-header"><b>How to play</b></span>
-    <span id="toggle-arrow" class="toggle-arrow">▼</span>
     <div id="how-to-play-content" class="how-to-play-content">
       <p>
+        <h3>How to Play: <span id="howto-close" class="inner-toggle">▲</span></h3>
         1. Pick a color from the options below the grid (e.g. 🔴)<br>
         2. Click on a color tile (e.g. 🟦) in grid to change to selected colour (🟦→🟥)<br>
         3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br>
@@ -447,7 +594,7 @@
   
   <!-- Your Score Section -->
   <div id="score-section">
-    <span id="score"></span>
+    <div id="score"></div>
   </div>
   
   <!-- Grid -->
@@ -457,17 +604,28 @@
   <div id="moves-container">
     <div id="moves">Moves made: 0</div>
     <!-- Undo button will be shown based on CONFIG.showUndo -->
-    <button id="undo">↺</button>
+    <button id="undo" aria-label="Undo">
+      <i class="fa-solid fa-rotate-left"></i>
+    </button>
   </div>
   
-  <!-- Color Picker -->
-  <div class="color-picker">
-    <button class="color-btn R" data-color="#E9625A"></button>
-    <button class="color-btn G" data-color="#43A95D"></button>
-    <button class="color-btn B" data-color="#4086D3"></button>
-    <button class="color-btn Y" data-color="#FDD538"></button>
+  <!-- Controls: Swatch Pill + Reset Button -->
+  <div id="controls-wrapper">
+    <!-- Pill only around swatches -->
+    <div id="swatch-pill">
+      <div class="color-picker">
+        <button class="color-btn R" data-color="#E9625A"></button>
+        <button class="color-btn G" data-color="#43A95D"></button>
+        <button class="color-btn B" data-color="#4086D3"></button>
+        <button class="color-btn Y" data-color="#FDD538"></button>
+      </div>
+    </div>
+    <!-- Reset sits at extreme right -->
+    <button id="reset-button" class="reset-button" aria-label="Reset">
+      <span>Reset</span>
+    </button>
   </div>
-  
+
   <!-- More Puzzles Section (Pagination & Reset) -->
   <div id="page-pagination" class="pagination"></div>
   
@@ -492,29 +650,27 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["R", "R", "R", "G", "B", "B", "B", "R"],
-        ["R", "R", "R", "Y", "B", "B", "B", "R"],
-        ["R", "R", "R", "Y", "B", "B", "B", "R"],
-        ["B", "B", "B", "G", "G", "G", "G", "G"],
-        ["R", "R", "R", "Y", "B", "R", "Y", "Y"],
-        ["B", "B", "R", "G", "B", "R", "Y", "Y"],
-        ["B", "B", "R", "Y", "B", "R", "R", "R"],
-        ["G", "G", "G", "Y", "Y", "B", "B", "B"],
-        ["B", "B", "G", "R", "R", "B", "G", "G"],
-        ["B", "B", "G", "R", "R", "B", "G", "G"]
-
-
+        ["B", "B", "G", "G", "B", "B", "B", "B"],
+        ["B", "B", "G", "G", "B", "B", "B", "B"],
+        ["R", "R", "R", "R", "R", "R", "R", "Y"],
+        ["B", "B", "G", "G", "B", "B", "B", "B"],
+        ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "R"],
+        ["G", "B", "G", "G", "B", "B", "B", "B"],
+        ["R", "R", "R", "R", "R", "R", "R", "Y"],
+        ["B", "B", "G", "G", "B", "B", "B", "B"],
+        ["Y", "Y", "Y", "Y", "Y", "Y", "Y", "R"],
+        ["B", "B", "G", "G", "B", "B", "B", "B"]
       ],
-      maxMoves: 10,
+      maxMoves: 9,
       winConditions: [
-        { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
+        // { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
         { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
-        { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
-        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
+        // { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
+        // { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 32,
+        currentPage: 33,
         maxPage: 33,
         showPrev: true,
         showNext: true,
@@ -572,6 +728,14 @@
 
     // Load achievements on game initialization
     loadAchievements();
+
+    // Numeric ratings for each objective (0=none, 1=bronze, 2=silver, 3=gold)
+    let starRatings = achievedColors.map(c =>
+      c === "gold"   ? 3 :
+      c === "silver" ? 2 :
+      c === "peru"   ? 1 :
+      0
+    );
 
     // --- New Code for Reset Counter and Free Reset Flag using namespaced keys ---
     const RESET_COUNTER_KEY = getStorageKey("paintItFullResetCounter");
@@ -649,12 +813,33 @@
     
     // Generate dynamic objectives HTML (used by both dropdown and modal)
     function generateObjectivesHTML() {
-      let html = '<h3>Objectives</h3><ul style="list-style:none; padding:0;">';
+      let html = '<h3>Objectives: <span id="objectives-close" class="inner-toggle">▲</span></h3>'
+              + '<ul style="list-style:none; padding:0;">';
       CONFIG.winConditions.forEach((condition, index) => {
-        html += `<li data-index="${index}">${condition.description} <span class="star objective-star" data-star-index="${index}">☆</span></li>`;
+        html += `<li data-index="${index}">`
+            + `${condition.description} `
+            + `<i class="star objective-star fa-regular fa-star" data-star-index="${index}"></i>`
+            + `</li>`;
       });
       html += '</ul>';
       return html;
+    }
+
+    // Grade scales keyed by max possible points
+    const gradeScales = {
+      12: ["F","E","D","C-","C","C+","B-","B","B+","A-","A","A+"],
+      9: ["F","E","D","C","C+","B","B+","A","A+"],
+      6: ["F","E","D","C","B","A","A+"],
+      3: ["F","B","A","A+"]
+    };
+
+    /**
+     * Map a point‐total into a letter grade, based on maxPoints.
+     */
+    function getGrade(points, maxPoints) {
+      const scale = gradeScales[maxPoints] || gradeScales[12];
+      const idx = Math.max(0, Math.min(points, scale.length - 1));
+      return scale[idx];
     }
     
     function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
@@ -769,13 +954,13 @@
             // End of animation - re-enable actions.
           isAnimating = false;
             if (movesMade >= CONFIG.maxMoves && starsAchieved.filter(s => s).length < CONFIG.winConditions.length) {
-            showModal("Nah! Try Again!", false);
+              showLossModal();
             } else if (starsAchieved.filter(s => s).length === CONFIG.winConditions.length && !autoWinModalShown) {
                 const gridSolved = CONFIG.winConditions.some(condition =>
                     currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))
                 );
                 if (gridSolved) {
-                    showModal("Bravo! You won!", true);
+                    showWinModal();
                     autoWinModalShown = true;
                 }
             }
@@ -788,115 +973,85 @@
     
     // ================= STAR & SCORE UPDATES =================
     function updateStars() {
-    CONFIG.winConditions.forEach((condition, index) => {
-        // Determine current rating (0 if not achieved)
-        let currentRating = 0;
-        if (achievedColors[index] === "gold") currentRating = 3;
-        else if (achievedColors[index] === "silver") currentRating = 2;
-        else if (achievedColors[index] === "peru") currentRating = 1;
-        
-        // Check if the grid meets the win condition (you might want to ignore blocked cells if needed)
+      CONFIG.winConditions.forEach((condition, index) => {
+        // 1) What rating do we already have?
+        const currentRating = starRatings[index] || 0;
+
+        // 2) Only if this color is fully painted...
         if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
-          // Determine new rating based on movesMade
-        let newRating = 0;
-        let newStarColor = "";
-        if (movesMade <= condition.optimal) {
-            newRating = 3;
-            newStarColor = "gold";
-        } else if (movesMade <= condition.silver) {
-            newRating = 2;
-            newStarColor = "silver";
-        } else if (movesMade <= condition.bronze) {
-            newRating = 1;
-            newStarColor = "peru";
-        }
-        // Only update if the new rating is better than the current rating
-        if (newRating > currentRating) {
-            starsAchieved[index] = true;  // remains true once any rating is achieved
-            achievedColors[index] = newStarColor;
-            document.querySelectorAll(`.objective-star[data-star-index="${index}"]`).forEach(starElem => {
-            starElem.classList.add("achieved");
-            starElem.textContent = "★";
-            starElem.style.color = newStarColor;
-            starElem.style.transform = "scale(1.5)";
-            setTimeout(() => { starElem.style.transform = "scale(1)"; }, 300);
-            });
-            // Update localStorage to persist the new achievements state
+          // 3) Figure out the new rating 0–3
+          let newRating = 0, newStarColor = "";
+          if (movesMade <= condition.optimal) {
+            newRating = 3; newStarColor = "gold";
+          } else if (movesMade <= condition.silver) {
+            newRating = 2; newStarColor = "silver";
+          } else if (movesMade <= condition.bronze) {
+            newRating = 1; newStarColor = "peru";
+          }
+
+          // 4) If we’ve improved, commit it
+          if (newRating > currentRating) {
+            starRatings[index]     = newRating;      // Award points
+            achievedColors[index]  = newStarColor;   // Color for icon
+            document
+              .querySelectorAll(`.objective-star[data-star-index="${index}"]`)
+              .forEach(starElem => {
+                starElem.classList.add("achieved");
+                starElem.classList.replace("fa-regular","fa-solid");
+                starElem.style.color = newStarColor;
+                starElem.style.transform = "scale(1.5)";
+                setTimeout(() => starElem.style.transform = "scale(1)", 300);
+              });
             updateAchievementsStorage();
 
-            // --- New: Grant a free reset when a new achievement is attained ---
+            // Free reset flag as before
             freeResetAvailable = true;
             updateResetStorage();
+          }
         }
-        }
-    });
+      });
     }
     
     function updateScoreDisplay() {
-        let scoreHTML = "";
-        // Loop over the active win conditions
-        CONFIG.winConditions.forEach((condition, idx) => {
-            const color = condition.color; // Get the color directly from the condition
-            const colorHex = letterToHex(color);
-            if (starsAchieved[idx] && achievedColors[idx]) {
-            // Achieved star
-            scoreHTML += `
-                <div class="score-item" 
-                    style="display:inline-block; text-align:center; margin:0 4px;">
-                <span class="star achieved" 
-                        style="font-size:1.4em; color:${achievedColors[idx]};">
-                    ★
-                </span>
-                <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
-                </div>`;
-            } else {
-            // Not achieved star
-            scoreHTML += `
-                <div class="score-item" 
-                    style="display:inline-block; text-align:center; margin:0 4px;">
-                <span class="star" 
-                        style="font-size:1.4em; color:#ccc;">
-                    ☆
-                </span>
-                <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
-                </div>`;
-            }
-        });
-        document.getElementById('score').innerHTML = scoreHTML;
-    }
-
-    // New function: Check if the grid is solved on page load and show win modal as a reminder
-    function checkForWinOnPageOpen() {
-        if (starsAchieved.filter(s => s).length === CONFIG.winConditions.length && !autoWinModalShown) {
-            const gridSolved = CONFIG.winConditions.some(condition =>
-                currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))
-            );
-            if (gridSolved) {
-                showModal("Bravo! You won!", true);
-                autoWinModalShown = true;
-            }
-        }
+      let scoreHTML = "";
+      CONFIG.winConditions.forEach((condition, idx) => {
+          const colorHex = letterToHex(condition.color);
+          if (starRatings[idx] > 0 && achievedColors[idx]) {
+              // Achieved star (solid icon)
+              scoreHTML += `
+                  <div class="score-item" style="display:inline-block; text-align:center; margin:0 4px;">
+                    <i class="fa-solid fa-star" 
+                      style="font-size:1.4em; color:${achievedColors[idx]};"></i>
+                    <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+                  </div>`;
+          } else {
+              // Unachieved star (outline icon)
+              scoreHTML += `
+                  <div class="score-item" style="display:inline-block; text-align:center; margin:0 4px;">
+                    <i class="fa-regular fa-star" 
+                      style="font-size:1.4em; color:#ccc;"></i>
+                    <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+                  </div>`;
+          }
+      });
+      document.getElementById('score').innerHTML = scoreHTML;
     }
 
     // Function to update the objectives dropdown stars based on persisted achievements
     function updateObjectivesStars() {
-      // Iterate over each star element in the objectives dropdown
-      document.querySelectorAll('.objective-star').forEach((starElem) => {
+      document.querySelectorAll('.objective-star').forEach(starElem => {
         const idx = starElem.getAttribute('data-star-index');
-        // Use the persisted achievements values (starsAchieved and achievedColors)
-        if (starsAchieved[idx] && achievedColors[idx]) {
+        if (starRatings[idx] > 0 && achievedColors[idx]) {
           starElem.classList.add("achieved");
-          starElem.textContent = "★";
+          starElem.classList.replace('fa-regular','fa-solid');
           starElem.style.color = achievedColors[idx];
         } else {
           starElem.classList.remove("achieved");
-          starElem.textContent = "☆";
-          starElem.style.color = "#fff"; // or your default color for unachieved stars
+          starElem.classList.replace('fa-solid','fa-regular');
+          starElem.style.color = "#fff";
         }
       });
     }
-
-
     
     // ================= RESET & UNDO =================
     function resetGame() {
@@ -951,59 +1106,247 @@
     }
     
     // ================= MODAL HANDLING =================
-    function showModal(message, isWin) {
+    function showModal(message, variant) {
+      window.currentModalVariant = variant;
+
       const modal = document.getElementById('modal');
       const modalHeader = document.getElementById('modal-header');
+      const modalObj = document.getElementById('modal-objectives');
+
+      // --- Always start by wiping old injections ---
+      // Reset objectives (we'll re-clone below)
+      const rawObjHTML = document
+        .getElementById('objectives-content')
+        .innerHTML
+        .replace(/<span[^>]*class="inner-toggle"[^>]*>.*?<\/span>/g, '');
+      modalObj.innerHTML = rawObjHTML;
+
+      // remove **all** adjacent <hr> separators
+      let next = modalObj.nextElementSibling;
+      while (next && next.tagName === 'HR') {
+        next.remove();
+        next = modalObj.nextElementSibling;
+      }
+
+      const oldWelcome = document.getElementById('modal-welcome-howto');
+      if (oldWelcome) oldWelcome.remove();
+      const oldScoreHTP = document.getElementById('modal-score-howto');
+      if (oldScoreHTP) oldScoreHTP.remove();
+
+      // Hide More-Puzzles by default; each branch will override if needed
+      document.getElementById('modal-more-puzzles').style.display = 'none';
+
+      // ——— 1) WELCOME MODAL ———
+      if (variant === 'welcome') {
+        // Header
+        modalHeader.innerHTML = `
+          <h3 style="text-align:center; margin:0 0 1em 0;">
+            Objectives 
+            <i class="fa-solid fa-circle-exclamation" style="color:#FDD538"></i>
+          </h3>
+        `;
+
+      // Remove the default cloned “Objectives:” H3
+      const defaultH3 = document
+        .getElementById('modal-objectives')
+        .querySelector('h3');
+      if (defaultH3) defaultH3.remove();
+
+        // Separator + How-to-Play
+        modalObj.insertAdjacentHTML('afterend','<hr>');
+        const hrElem = modalObj.nextElementSibling;
+        hrElem.insertAdjacentHTML('afterend', `
+          <div id="modal-welcome-howto" style="margin-top:1em;">
+            <h3 style="display:flex; align-items:center; margin:0;">
+              <span>How to Play</span>
+              <button id="welcome-help" class="help-button" 
+                      style="margin-left:0.5em;">
+                <i class="fa-solid fa-question"></i>
+              </button>
+            </h3>
+            <div id="welcome-howto-content" 
+                style="display:none; padding-left:1em; text-align:left;">
+              ${document
+                .getElementById('how-to-play-content')
+                .innerHTML
+                .replace(/<h3[^>]*>.*?<\/h3>/, '')}
+            </div>
+          </div>
+        `);
+        document.getElementById('welcome-help')
+          .addEventListener('click', () => {
+            const c = document.getElementById('welcome-howto-content');
+            c.style.display = c.style.display === 'block' ? 'none' : 'block';
+          });
+        modal.style.display = 'flex';
+        return;
+      }
+
+      // ——— 2) SCORE MODAL ———
+      if (variant === 'score') {
+        const next = modalObj.nextElementSibling;
+        if (next && next.tagName === 'HR') next.remove();
+        const old = document.getElementById('modal-score-howto');
+        if (old) old.remove();
+
+        modalHeader.textContent = message;
+
+        // Separator + How-to-Play
+        modalObj.insertAdjacentHTML('afterend','<hr>');
+        const hrElem = modalObj.nextElementSibling;
+        hrElem.insertAdjacentHTML('afterend', `
+          <div id="modal-score-howto" style="margin-top:1em;">
+            <h3 style="display:flex; align-items:center; margin:0;">
+              <span>How to Play</span>
+              <button id="score-help" class="help-button" 
+                      style="margin-left:0.5em;">
+                <i class="fa-solid fa-question"></i>
+              </button>
+            </h3>
+            <div id="score-howto-content" 
+                style="display:none; padding-left:1em; text-align:left;">
+              ${document
+                .getElementById('how-to-play-content')
+                .innerHTML
+                .replace(/<h3[^>]*>.*?<\/h3>/, '')}
+            </div>
+          </div>
+        `);
+        document.getElementById('score-help')
+          .addEventListener('click', () => {
+            const c = document.getElementById('score-howto-content');
+            c.style.display = c.style.display === 'block' ? 'none' : 'block';
+          });
+
+        // Show More-puzzles only once every objective has at least a bronze
+        const countAchieved = starRatings.filter(r => r > 0).length;
+        if (countAchieved === CONFIG.winConditions.length) {
+          document.getElementById('modal-more-puzzles').style.display = 'block';
+          updateModalPagination();
+        }
+
+        modal.style.display = 'flex';
+        return;
+      }
+
+      // ——— 3) WIN / LOSS (default) ———
+      // Simple text header
       modalHeader.textContent = message;
-      // Instead of regenerating, copy the objectives content from the dropdown.
-      document.getElementById('modal-objectives').innerHTML = document.getElementById('objectives-content').innerHTML;
+      const isWin = variant === true || variant === 'win';
       if (isWin) {
         document.getElementById('modal-more-puzzles').style.display = 'block';
         updateModalPagination();
-      } else {
-        document.getElementById('modal-more-puzzles').style.display = 'none';
       }
       modal.style.display = 'flex';
     }
-    
+
+    // Semantic modal wrappers
+    function showLossModal() {
+      showModal("Nah! Try Again!", false);
+    }
+
+    function showWinModal() {
+      showModal("Bravo! You won!", true);
+    }
+
+    function showScoreModal() {
+      // 1) Sum all points
+      const totalPoints = starRatings.reduce((sum, r) => sum + r, 0);
+      const maxPoints   = CONFIG.winConditions.length * 3;
+      // 2) Convert to grade
+      const grade = getGrade(totalPoints, maxPoints);
+      // 3) Display
+      showModal(`Grade: ${grade}`, 'score');
+    }
+
+    function showWelcomeModal() {
+      showModal('', 'welcome');
+    }
+
     function closeModal() {
       document.getElementById('modal').style.display = 'none';
     }
-    
+
+    /**
+     * Animate the Welcome modal shrinking into the Objectives icon.
+     */
+    function animateAndCloseWelcome() {
+      const modalEl = document.getElementById('modal');
+      const modalContent = modalEl.querySelector('.modal-content');
+      const contentRect = modalContent.getBoundingClientRect();
+      const scoreDiv = document.getElementById('score');
+      const objRect  = scoreDiv.getBoundingClientRect();
+
+      // Clone the modal-content
+      const clone = modalContent.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.top = `${contentRect.top}px`;
+      clone.style.left = `${contentRect.left}px`;
+      clone.style.width = `${contentRect.width}px`;
+      clone.style.height = `${contentRect.height}px`;
+      clone.style.margin = 0;
+      clone.style.transition = 'transform 1.2s ease-in-out, opacity 1.1s ease-out';
+      clone.style.transformOrigin = 'center center';
+      document.body.appendChild(clone);
+
+      // Hide the real modal immediately
+      modalEl.style.display = 'none';
+
+      // Calculate center-to-center offsets
+      const deltaX = (objRect.left + objRect.width/2) - (contentRect.left + contentRect.width/2);
+      const deltaY = (objRect.top  + objRect.height/2) - (contentRect.top  + contentRect.height/2);
+
+      // Trigger the animation on the next frame
+      requestAnimationFrame(() => {
+        clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1)`;
+        clone.style.opacity   = '0';
+      });
+
+      // Clean up when done
+      clone.addEventListener('transitionend', () => clone.remove());
+    }
+
     // ================= EVENT LISTENERS =================
-    document.getElementById('score').addEventListener('click', () => {
-      let achievedCount = starsAchieved.filter(s => s).length;
-      showModal(`Score: ${achievedCount}/${CONFIG.winConditions.length}`, achievedCount === CONFIG.winConditions.length);
-    });
-    
-    document.getElementById('modal-close').addEventListener('click', closeModal);
-    window.addEventListener('click', function(event) {
-      const modal = document.getElementById('modal');
-      if (event.target == modal) closeModal();
-    });
-    
-    document.getElementById('objectives-header').addEventListener('click', () => {
-      const content = document.getElementById('objectives-content');
-      const toggleArrow = document.getElementById('objectives-toggle');
-      if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        toggleArrow.textContent = '▲';
+    document.getElementById('score').addEventListener('click', showScoreModal);
+
+    // Close-button: animate for Welcome, otherwise normal close
+    document.getElementById('modal-close').addEventListener('click', () => {
+      if (window.currentModalVariant === 'welcome') {
+        animateAndCloseWelcome();
       } else {
-        content.style.display = 'none';
-        toggleArrow.textContent = '▼';
+        closeModal();
       }
     });
-    // How To Play Toggle 
-    document.getElementById('toggle-arrow').addEventListener('click', () => {
+
+    // Backdrop click: delegate to the same close-button logic
+    document.getElementById('modal').addEventListener('click', e => {
+      // only if they click exactly on the overlay, not inside the content
+      if (e.target === e.currentTarget) {
+        // trigger the close-button’s click handler
+        document.getElementById('modal-close').click();
+      }
+    });
+
+    document.getElementById('reset-button').addEventListener('click', resetGame);
+    document.getElementById('reset-button').addEventListener('touchstart', e => {
+      e.preventDefault();
+      resetGame();
+    });
+    
+    // Help-button directly toggles How To Play content
+    document.getElementById('help-button').addEventListener('click', () => {
       const content = document.getElementById('how-to-play-content');
-      if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        document.getElementById('toggle-arrow').textContent = '▲';
-      } else {
-        content.style.display = 'none';
-        document.getElementById('toggle-arrow').textContent = '▼';
-      }
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
     });
+    // Objectives-icon directly toggles the dropdown
+    document.getElementById('objectives-button').addEventListener('click', () => {
+      const content = document.getElementById('objectives-content');
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    });
+    // Reset-icon resets the game
+    document.getElementById('reset-button').addEventListener('click', resetGame);
+    document.getElementById('reset-button').addEventListener('touchstart', e => { e.preventDefault(); resetGame(); });
+
     // ================= PAGINATION =================    
     function updatePagePagination() {
       const pagePagination = document.getElementById("page-pagination");
@@ -1020,10 +1363,8 @@
       } else {
         nextHTML = '<div class="next"></div>';
       }
-      const centerHTML = '<div class="reset-container"><button id="reset">Reset</button></div>';
-      pagePagination.innerHTML = prevHTML + centerHTML + nextHTML;
-      document.getElementById("reset").addEventListener("click", resetGame);
-      document.getElementById("reset").addEventListener("touchstart", (e) => { e.preventDefault(); resetGame(); });
+      // no center Reset in pagination any more
+      pagePagination.innerHTML = prevHTML + nextHTML;
     }
     
     function updateModalPagination() {
@@ -1051,8 +1392,15 @@
     createGrid();
     updatePagePagination();
     updateScoreDisplay();
-    checkForWinOnPageOpen();
-    
+
+    // Show Welcome only to brand‐new users, otherwise show Win modal
+    const achievedCount = starRatings.filter(r => r > 0).length;
+    if (achievedCount === 0) {
+      showModal('', 'welcome');
+    } else {
+      showModal("Bravo! You won!", true);
+    }
+
     // Attach color button event listeners
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1077,6 +1425,29 @@
     } else {
       document.getElementById('undo').style.display = 'none';
     }
+    
+    // Close Objectives on inner ▲ click
+    document.getElementById('objectives-content').addEventListener('click', e => {
+      if (e.target.id === 'objectives-close') {
+        document.getElementById('objectives-content').style.display = 'none';
+      }
+    });
+    // Close How-to-Play on inner ▲ click
+    document.getElementById('how-to-play-content').addEventListener('click', e => {
+      if (e.target.id === 'howto-close') {
+        document.getElementById('how-to-play-content').style.display = 'none';
+      }
+    });
+
   </script>
+
+  <!-- Clicky Analytics -->
+  <script async data-id="101482773" src="//static.getclicky.com/js"></script>
+  <noscript>
+    <p style="display: none;">
+      <img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101482773ns.gif" />
+    </p>
+  </noscript>
+    
 </body>
 </html>
