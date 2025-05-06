@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Paint it All</title>
+  <script src="https://kit.fontawesome.com/733857cba7.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+    /*—— Colour & pattern definitions ——*/
+    --pattern-R-color: #E9625A;
+    --pattern-R-image: 
+        repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+        );
+    --pattern-R-size: 8px 8px;
+
+    --pattern-G-color: #43A95D;
+    --pattern-G-image:
+        repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+        ),
+        repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 4px,
+        rgba(0,0,0,0.05) 4px,
+        rgba(0,0,0,0.05) 8px
+        );
+    --pattern-G-size: 8px 8px;
+
+    --pattern-Y-color: #FDD538;
+    --pattern-Y-image:
+        linear-gradient(
+        45deg,
+        rgba(0,0,0,0.05) 25%,
+        transparent 25%,
+        transparent 75%,
+        rgba(0,0,0,0.05) 75%,
+        rgba(0,0,0,0.05) 100%
+        ),
+        linear-gradient(
+        45deg,
+        rgba(0,0,0,0.05) 25%,
+        transparent 25%,
+        transparent 75%,
+        rgba(0,0,0,0.05) 75%,
+        rgba(0,0,0,0.05) 100%
+        );
+    --pattern-Y-size: 10px 10px;
+    --pattern-Y-position: 0 0, 5px 5px;
+
+    --pattern-B-color: #4086D3;
+    --pattern-B-image:
+        radial-gradient(
+        circle at center,
+        rgba(0,0,0,0.1) 1px,
+        transparent 1px
+        );
+    --pattern-B-size: 10px 10px;
+    }
+
+    /* Global Styles */
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      cursor: default;
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 10px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #36454F;
+      font-family: Arial, sans-serif;
+      touch-action: manipulation;
+      min-height: 100vh;
+    }
+    h1#game-title {
+      font-size: 1.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+    /* Header bar: title + help icon */
+    #header-bar {
+      width: 90%;
+      max-width: 480px;
+      margin: 5px auto 0;
+      display: flex;
+      align-items: center;
+      /* no longer justify-content: space-between—buttons are grouped */
+    }
+    #header-bar h1 {
+      flex: 1;               /* fill remaining space */
+      margin: 0;             /* remove old auto-centering margins */
+      font-size: 1.7em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 8px;              /* space between icons */
+    }
+    .help-button {
+      background: transparent;
+      border: 1px solid #fff; /* default white for help */
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;            /* default white for help */
+      font-size: 1em;
+      cursor: pointer;
+      padding: 0;
+    }
+    /* Objectives icon—transparent ring, same size as help-button */
+    #objectives-button {
+      /* match the help-button’s border-box sizing */
+      width: 30px;
+      height: 30px;
+      border: 1px solid transparent;  /* preserve 1px “ring” for consistent box-sizing */
+      border-radius: 50%;
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* match the help-button’s glyph sizing */
+      font-size: 1.6em;
+      color: #FDD538;
+      
+      padding: 0;
+    }
+    .help-button i {
+      pointer-events: none;
+    }
+
+    /* Objectives Dropdown */
+    .objectives-dropdown {
+      width: 100%;
+      max-width: 480px;
+      margin: 2px 2px;
+      color: #fff;
+      font-size: 0.9em;
+    }
+    #objectives-content {
+      display: none;
+      margin-top: 5px;
+    }
+    /* Star styling */
+    .star {
+      font-size: 1.2em;
+      transition: transform 0.3s ease;
+      /* For unachieved stars, the color and border will be set inline */
+    }
+    .star.achieved {
+      /* Remove forced color here so inline styles prevail */
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+    /* How To Play Dropdown */
+    .how-to-play-dropdown {
+      width: 100%;
+      max-width: 480px;
+      margin: 2px 2px;
+      color: #fff;
+      font-size: 0.9em;
+      text-align: left;
+    }
+    .how-to-play-content {
+      display: none;
+      margin-top: 4px;
+      padding-left: 20px;
+      border-left: 2px solid #fff;
+    }
+
+    .inner-toggle {
+      color: #FDD538;       /* project yellow */
+      cursor: pointer;
+      margin-left: 4px;     /* a little breathing room */
+      font-size: 1em;
+    }
+
+    /* Your Score Section */
+    #score-section {
+      text-align: center;
+      margin: 15px 0;
+      color: #fff;
+      font-size: 1.2em;
+    }
+    #score {
+      cursor: pointer;
+    }
+    /* Grid Styles */
+    .grid {
+      position: relative;
+      display: grid;
+      gap: 0;
+      padding: 2px;
+      border: 2px solid white;
+      border-radius: 5px;
+      margin: 8px auto;
+      touch-action: none;
+      grid-template-columns: repeat(8, 1fr);
+      width: 90%;
+      max-width: 480px;
+      background: url('images/bg.png') no-repeat center center;
+      background-size: cover;
+    }
+    .tile {
+      width: 100%;
+      aspect-ratio: 1/1;
+      transition: background 0.3s ease, transform 0.3s ease;
+      /* Hint for GPU acceleration */
+      will-change: transform, background;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1em;
+      border: 1px solid white;
+      border-radius: 4px;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tile:focus { outline: none; }
+    .tile, .color-btn, #undo { cursor: pointer; }
+    /* Pop Animation */
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .pop {
+      animation: pop 0.3s ease;
+    }
+    /* Moves Made & Undo */
+    #moves-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 1.3em;
+      margin: 10px 0;
+    }
+    /* Undo button: will be shown or hidden based on CONFIG.showUndo */
+    #undo {
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #undo i {
+      pointer-events: none;
+      display: block;
+      width: 100%;
+      text-align: center;
+      font-size: 0.85em; /* keep your chosen size */
+    }
+
+    /* Wrapper that holds the pill and reset button */
+    #controls-wrapper {
+      width: 90%;
+      max-width: 480px;
+      margin: 8px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;   /* pushes reset to the far right */
+    }
+
+    /* The pill container around only the swatches */
+    #swatch-pill {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    /* Swatches inside the pill */
+    #swatch-pill .color-picker {
+      display: flex;
+      gap: 10px;
+    }
+    #swatch-pill .color-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+    }
+    #swatch-pill .color-btn.selected {
+      transform: scale(1.2);
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+      border: 2px solid #fff;
+    }
+
+    .reset-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;                   /* space between text & icon */
+      padding: 8px 12px;          /* more horizontal room */
+      background: transparent;
+      border: 2px solid #fff;     /* longer border now wraps text+icon */
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.95em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);  /* stronger click affordance */
+      cursor: pointer;
+    }
+    .reset-button span {
+      line-height: 1;             /* ensure text centers vertically */
+    }
+    .reset-button i {
+      pointer-events: none;
+    }
+
+    /* More Puzzles Section */
+    #page-pagination {
+      width: 100%;
+      max-width: 480px;
+      margin: 10px auto;
+      text-align: center;
+      font-size: 0.95em;
+      color: #fff;
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      align-items: center;
+    }
+    .prev, .next, .reset-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #page-pagination a {
+      text-decoration: none;
+      color: #fff;
+      font-style: italic;
+      padding: 5px;
+    }
+    #page-pagination a:hover { opacity: 0.8; }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #d7f6f8;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 99%;
+      max-height: 88%;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    /* ==== Objective-Modal: text left, star right, star color = black ==== */
+    #modal-objectives ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    #modal-objectives li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75em;
+      /* ensures text sits left, icon sits right */
+    }
+    #modal-objectives li:last-child {
+      margin-bottom: 0;
+    }
+    /* 1. Only un-achieved stars stay black */
+    #modal-objectives .objective-star:not(.achieved) {
+      color: #000;
+    }
+
+    /* 2. Give every star the same font-size & line-height */
+    #modal-objectives .objective-star {
+      font-size: 1.2em;
+      line-height: 1;
+    }
+
+    /* 1. Left-align any <h3> inside the modal-objectives (win/loss/score) */
+      #modal-objectives h3 {
+      text-align: left;
+      margin-bottom: 0.5em;
+    }
+
+    #modal-objectives {
+      margin-bottom: 1.5em;
+    }
+
+    /* 2. Shrink the “?” button and force a black border in the Welcome & Score modal sections */
+    #modal-welcome-howto .help-button,
+    #modal-score-howto .help-button {
+      display: flex;               /* turn on flex centering */
+      align-items: center;         /* vertical centre */
+      justify-content: center;     /* horizontal centre */
+      box-sizing: border-box;      /* include border in size */
+      width: 1.4em;                /* slightly larger if you like */
+      height: 1.4em;               /* same as width for a square */
+      border: 1px solid #000;      /* black outline */
+      padding: 0;                  /* drop the old padding */
+    }
+
+    #modal-welcome-howto .help-button i,
+    #modal-score-howto .help-button i {
+      font-size: 1em;              /* full container height for icon */
+      line-height: 1;
+      color: #000;              /* no extra leading */
+    }
+
+    /* 3. Left-align the How-to-Play content inside the welcome modal */
+    #welcome-howto-content {
+      text-align: left;
+    }
+
+    #score-howto-content {
+      text-align: left;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .modal-message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .modal-more-puzzles {
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+    .modal-more-puzzles em {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .modal-pagination {
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      align-items: center;
+      width: 100%;
+    }
+    .modal-pagination a {
+      text-decoration: none;
+      color: black;
+      font-style: italic;
+      padding: 5px;
+    }
+    .modal-pagination a:hover { opacity: 0.8; }
+
+    /*—— Unified tile patterns ——*/
+    .tile.R, .color-btn.R {
+    background-color: var(--pattern-R-color);
+    background-image: var(--pattern-R-image);
+    background-size: var(--pattern-R-size);
+    }
+    .tile.G, .color-btn.G {
+    background-color: var(--pattern-G-color);
+    background-image: var(--pattern-G-image);
+    background-size: var(--pattern-G-size);
+    }
+    .tile.Y, .color-btn.Y {
+    background-color: var(--pattern-Y-color);
+    background-image: var(--pattern-Y-image);
+    background-size: var(--pattern-Y-size);
+    background-position: var(--pattern-Y-position);
+    }
+    .tile.B, .color-btn.B {
+    background-color: var(--pattern-B-color);
+    background-image: var(--pattern-B-image);
+    background-size: var(--pattern-B-size);
+    }
+
+    /* Blocked tiles: always grey */
+    .tile.blocked {
+      background-color: rgba(161,166,179,0.8);
+      border: 2px solid #898d95;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
+
+    /*—— Extracted Modal Styles ——*/
+    /* 1. Welcome modal header */
+    .welcome-modal-header {
+    text-align: center;
+    margin: 0 0 1em 0;
+    }
+
+    /* 2. Header styling for How-to-Play in both Welcome & Score modals */
+    .modal-howto-header {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    }
+
+    /* 3. How-to-Play button in both welcome & score modals */
+    .modal-howto-button {
+    margin-left: 0.5em;
+    display: inline-flex;       /* ensure its inline and centers its icon */
+    align-items: center;
+    justify-content: center;
+    }
+
+    /* 4. The hidden How-to-Play content container */
+    .modal-howto-content {
+    display: none;
+    padding-left: 1em;
+    text-align: left;
+    }
+
+    /* 5. Separator spacing (if you need extra margin above/below HR) */
+    .modal-separator {
+    margin: 1em 0;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Header Bar: Title + Action Icons -->
+  <div id="header-bar">
+    <h1 id="game-title">
+      <span style="color:#E9625A">Pa</span><span style="color:#FFFFFF">i</span><span style="color:#4086D3">nt</span>
+      <span> </span>
+      <span style="color:#FFFFFF">it</span>
+      <span> </span>
+      <span style="color:#43A95D">A</span><span style="color:#FDD538">ll</span>
+    </h1>
+    <div class="header-buttons">
+      <button id="objectives-button" class="help-button" aria-label="Objectives">
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </button>
+      <button id="help-button" class="help-button" aria-label="How to play">
+        <i class="fa-solid fa-question"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Objectives Dropdown -->
+  <div id="objectives-dropdown" class="objectives-dropdown">
+    <!-- Objectives content will be generated dynamically -->
+    <div id="objectives-content" class="how-to-play-content"></div>
+  </div>
+  
+  <!-- How To Play Section -->
+  <div class="how-to-play-dropdown">
+    <div id="how-to-play-content" class="how-to-play-content">
+      <p>
+        <h3>How to Play: <span id="howto-close" class="inner-toggle">▲</span></h3>
+        1. Pick a color from the options below the grid (e.g. 🔴)<br>
+        2. Click on a color tile (e.g. 🟦) in grid to change to selected colour (🟦→🟥)<br>
+        3. All 🟦 tiles connected horizontally / vertically will change to 🟥<br>
+        4. Tiles in Grey are blocked and cannot be painted over.<br>
+        Give it a try!
+      </p>
+    </div>
+  </div>
+  
+  <!-- Your Score Section -->
+  <div id="score-section">
+    <div id="score"></div>
+  </div>
+  
+  <!-- Grid -->
+  <div id="grid" class="grid"></div>
+  
+  <!-- Moves Made & Undo -->
+  <div id="moves-container">
+    <div id="moves">Moves made: 0</div>
+    <!-- Undo button will be shown based on CONFIG.showUndo -->
+    <button id="undo" aria-label="Undo">
+      <i class="fa-solid fa-rotate-left"></i>
+    </button>
+  </div>
+  
+  <!-- Controls: Swatch Pill + Reset Button -->
+  <div id="controls-wrapper">
+    <!-- Pill only around swatches -->
+    <div id="swatch-pill">
+      <div class="color-picker">
+        <button class="color-btn R" data-color="#E9625A"></button>
+        <button class="color-btn G" data-color="#43A95D"></button>
+        <button class="color-btn B" data-color="#4086D3"></button>
+        <button class="color-btn Y" data-color="#FDD538"></button>
+      </div>
+    </div>
+    <!-- Reset sits at extreme right -->
+    <button id="reset-button" class="reset-button" aria-label="Reset">
+      <span>Reset</span>
+    </button>
+  </div>
+
+  <!-- More Puzzles Section (Pagination & Reset) -->
+  <div id="page-pagination" class="pagination"></div>
+  
+  <!-- Modal Pop-up -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="modal-close">&times;</span>
+      <div id="modal-header" class="modal-message"></div>
+      <div id="modal-objectives"></div>
+      <div id="modal-more-puzzles" class="modal-more-puzzles" style="display: none;">
+        <em>More puzzles</em>
+        <div class="modal-pagination">
+          <div class="prev" id="modal-prev"></div>
+          <div class="center" id="modal-center"></div>
+          <div class="next" id="modal-next"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // ================= CONFIG SECTION =================
+    const CONFIG = {
+      initialGrid: [
+        ["B", "B", "R", "R", "B", "B", "B", "B"],
+        ["B", "B", "R", "R", "B", "B", "B", "B"],
+        ["Y", "Y", "R", "R", "Y", "Y", "Y", "Y"],
+        ["Y", "Y", "R", "R", "Y", "Y", "Y", "Y"],
+        ["G", "G", "G", "G", "B", "B", "G", "G"],
+        ["G", "G", "G", "G", "B", "B", "G", "G"],
+        ["B", "B", "R", "R", "B", "R", "B", "B"],
+        ["B", "B", "R", "R", "Y", "X", "Y", "Y"],
+        ["B", "B", "R", "R", "B", "R", "B", "G"],
+        ["B", "B", "R", "R", "B", "R", "Y", "R"]
+      ],
+      maxMoves: 8,
+      winConditions: [
+        { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
+        // { color: "G", optimal: 5, silver: 6, bronze: 7, description: "Turn all tiles to Green 🟩 (Best - 5 moves)" },
+        { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
+        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
+      ],
+      scoringOrder: ["R", "G", "B", "Y"],
+      pagination: {
+        currentPage: 34,
+        maxPage: 34,
+        showPrev: true,
+        showNext: true,
+        prevText: "⏪<br><em>Previous</em>",
+        nextText: "⏩<br><em>Next</em>"
+      },
+      // Toggle for displaying the Undo button
+      showUndo: true
+    };
+    
+    // Instead of using CONFIG.pagination.currentPage,
+    // extract the file name from the URL and remove the .html extension.
+    const fileName = window.location.pathname.split('/').pop(); // e.g. "30B.html" or "30.html"
+    const puzzleId = fileName.replace('.html', ''); // yields "30B" or "30"
+
+
+    // Helper function to generate unique localStorage keys for this puzzle.
+    function getStorageKey(key) {
+        return puzzleId + "_" + key;
+    }
+
+    let autoWinModalShown = false;
+    let isAnimating = false;
+    // Global arrays to track achievement status and colors
+    let achievedColors = [null, null, null, null];
+
+    // Local Storage Persistence for Achievements using the puzzle-specific key
+    const ACHIEVEMENTS_KEY = getStorageKey("paintItFullAchievements");
+
+    // Load saved achievements from localStorage
+    function loadAchievements() {
+      const saved = localStorage.getItem(ACHIEVEMENTS_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data && Array.isArray(data.achievedColors)) {
+            achievedColors = data.achievedColors;
+          }
+        } catch (err) {
+          console.error("Error parsing achievements from localStorage", err);
+        }
+      }
+    }
+
+    // Save the current achievements info to localStorage
+    function updateAchievementsStorage() {
+      const data = {
+        achievedColors: achievedColors
+      };
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(data));
+    }
+
+    // Load achievements on game initialization
+    loadAchievements();
+
+    // Numeric ratings for each objective (0=none, 1=bronze, 2=silver, 3=gold)
+    let starRatings = achievedColors.map(c =>
+      c === "gold"   ? 3 :
+      c === "silver" ? 2 :
+      c === "peru"   ? 1 :
+      0
+    );
+
+    // --- New Code for Reset Counter and Free Reset Flag using namespaced keys ---
+    const RESET_COUNTER_KEY = getStorageKey("paintItFullResetCounter");
+    const FREE_RESET_KEY = getStorageKey("paintItFullFreeReset");
+
+    // Initialize reset counter and free reset flag from localStorage (or default if not present)
+    let resetCounter = parseInt(localStorage.getItem(RESET_COUNTER_KEY)) || 0;
+    let freeResetAvailable = localStorage.getItem(FREE_RESET_KEY) === "true" || false;
+
+    // Helper function to update reset counter and free reset flag in localStorage
+    function updateResetStorage() {
+      localStorage.setItem(RESET_COUNTER_KEY, resetCounter);
+      localStorage.setItem(FREE_RESET_KEY, freeResetAvailable);
+    }
+
+    // --- New Code for Persistent Undo Toggle using a namespaced key ---
+    // Set the threshold for enabling undo and a key to store its enabled status
+    const UNDO_THRESHOLD = 30;
+    const UNDO_ENABLED_KEY = getStorageKey("paintItFullUndoEnabled");
+
+    // Initialize undo flag from localStorage; if set, update CONFIG.showUndo
+    let undoEnabled = localStorage.getItem(UNDO_ENABLED_KEY) === "true";
+    if (undoEnabled) {
+      CONFIG.showUndo = true;
+    }
+        
+    // ================= WEB AUDIO API SETUP =================
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let popBuffer = null;
+    fetch('sounds/pop.mp3')
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+      .then(decodedData => {
+        popBuffer = decodedData;
+        console.log('Audio loaded and decoded, sample rate:', audioContext.sampleRate);
+      })
+      .catch(e => console.error('Error loading audio file:', e));
+    
+    // Function to play the pop sound at a given volume using Web Audio API
+    function playPopSound(volume = 1.0) {
+      if (!popBuffer) {
+        console.warn('Audio buffer not loaded yet.');
+        return;
+      }
+      const source = audioContext.createBufferSource();
+      source.buffer = popBuffer;
+      source.playbackRate.value = 1.0; // Ensure normal playback rate (no pitch shift)
+      const gainNode = audioContext.createGain();
+      // Optionally, use a ramp for smooth gain change:
+      // gainNode.gain.setTargetAtTime(volume, audioContext.currentTime, 0.01);
+      gainNode.gain.value = volume;
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      source.start(0);
+    }
+    
+    // ================= UTILITY FUNCTIONS =================
+    // ——— Colour map for bidirectional lookups ———
+    const COLOR_MAP = {
+    R: "#E9625A",
+    G: "#43A95D",
+    B: "#4086D3",
+    Y: "#FDD538"
+    };
+
+    function letterToHex(letter) {
+    return COLOR_MAP[letter] || "#000000";
+    }
+
+    function hexToLetter(hex) {
+    return Object.keys(COLOR_MAP).find(key => COLOR_MAP[key] === hex) || "";
+    }
+  
+    // Generate dynamic objectives HTML (used by both dropdown and modal)
+    function generateObjectivesHTML() {
+      let html = '<h3>Objectives: <span id="objectives-close" class="inner-toggle">▲</span></h3>'
+              + '<ul style="list-style:none; padding:0;">';
+      CONFIG.winConditions.forEach((condition, index) => {
+        html += `<li data-index="${index}">`
+            + `${condition.description} `
+            + `<i class="star objective-star fa-regular fa-star" data-star-index="${index}"></i>`
+            + `</li>`;
+      });
+      html += '</ul>';
+      return html;
+    }
+
+    // Grade scales keyed by max possible points
+    const gradeScales = {
+      12: ["F","E","D","C-","C","C+","B-","B","B+","A-","A","A+"],
+      9: ["F","E","D","C","C+","B","B+","A","A+"],
+      6: ["F","E","D","C","B","A","A+"],
+      3: ["F","B","A","A+"]
+    };
+
+    // Map a point‐total into a letter grade, based on maxPoints.
+    function getGrade(points, maxPoints) {
+      const scale = gradeScales[maxPoints] || gradeScales[12];
+      const idx = Math.max(0, Math.min(points, scale.length - 1));
+      return scale[idx];
+    }
+
+    // Returns true iff every objective has at least a bronze (rating > 0).
+    function allObjectivesMet() {
+    return starRatings.every(r => r > 0);
+    }
+    
+    function getConnectedTilesWithLevels(startRow, startCol, targetLetter) {
+      const visited = new Set();
+      const result = [];
+      const queue = [{ r: startRow, c: startCol, level: 0 }];
+      visited.add(`${startRow},${startCol}`);
+      while(queue.length > 0) {
+        const { r, c, level } = queue.shift();
+        result.push({ r, c, level });
+        const neighbors = [[r-1,c], [r+1,c], [r, c-1], [r, c+1]];
+        for (const [nr, nc] of neighbors) {
+          if(nr >= 0 && nr < currentGrid.length && nc >= 0 && nc < currentGrid[0].length) {
+            const key = `${nr},${nc}`;
+            if (!visited.has(key) && currentGrid[nr][nc] === targetLetter) {
+              visited.add(key);
+              queue.push({ r: nr, c: nc, level: level + 1 });
+            }
+          }
+        }
+      }
+      return result;
+    }
+    
+    // ================= GAME STATE =================
+    let currentGrid;
+    let selectedColor = null;
+    let movesMade = 0;
+    let history = [];
+    
+    // ================= GRID CREATION =================
+    function createGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      grid.style.gridTemplateColumns = `repeat(${CONFIG.initialGrid[0].length}, 1fr)`;
+      CONFIG.initialGrid.forEach((row, i) => {
+        row.forEach((letter, j) => {
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          // Always add the letter as an extra class (for CSS patterns)
+          tile.classList.add(letter);
+          tile.dataset.row = i;
+          tile.dataset.col = j;
+            // Only attach click events if not a blocked tile
+          if(letter === "X") {
+            tile.classList.add("blocked");
+          } else {
+            tile.addEventListener('click', handleTileClick);
+            tile.addEventListener('touchstart', handleTileClick);
+          }
+          grid.appendChild(tile);
+        });
+      });
+      currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
+    }
+    
+    // ================= MOVE HANDLING =================
+    function handleTileClick(e) {
+      if (!selectedColor || movesMade >= CONFIG.maxMoves || isAnimating) return;
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      const targetLetter = currentGrid[row][col];
+      if (targetLetter === selectedColor) return;
+      history.push({
+        grid: JSON.parse(JSON.stringify(currentGrid)),
+        moves: movesMade
+      });
+      const tilesWithLevels = getConnectedTilesWithLevels(row, col, targetLetter);
+      const groups = {};
+      tilesWithLevels.forEach(({r, c, level}) => {
+        if (!groups[level]) groups[level] = [];
+        groups[level].push({r, c});
+      });
+      movesMade++;
+      document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      // Begin animation: block all other actions.
+      isAnimating = true;
+      const delayFactorMs = 100; // 0.1 sec per level
+      const pendingAnimations = [];
+      const startTime = performance.now();
+      for (const level in groups) {
+        pendingAnimations.push({
+          level: parseInt(level),
+          scheduledTime: startTime + parseInt(level) * delayFactorMs,
+          tiles: groups[level],
+          played: false
+        });
+      }
+      function animateGroups(currentTime) {
+        pendingAnimations.forEach(animation => {
+          if (!animation.played && currentTime >= animation.scheduledTime) {
+            animation.tiles.forEach(({r, c}) => {
+              const tile = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+              tile.classList.add("pop");
+              setTimeout(() => tile.classList.remove("pop"), 300);
+              currentGrid[r][c] = selectedColor;
+              tile.classList.remove(targetLetter);
+              tile.classList.add(selectedColor);
+            });
+            const baseVolume = 1.0;
+            const reductionFactor = 0.1;
+            const volume = Math.max(baseVolume - (animation.level * reductionFactor), 0.1);
+            playPopSound(volume);
+            animation.played = true;
+          }
+        });
+        if (pendingAnimations.some(animation => !animation.played)) {
+          requestAnimationFrame(animateGroups);
+        } else {
+          updateStars();
+          updateScoreDisplay();
+          updateObjectivesStars();
+            // End of animation - re-enable actions.
+            isAnimating = false;
+
+            if (movesMade >= CONFIG.maxMoves && !allObjectivesMet()) {
+            showLossModal();
+            } else if (allObjectivesMet() && !autoWinModalShown) {
+                const gridSolved = CONFIG.winConditions.some(condition =>
+                currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))
+              );
+              if (gridSolved) {
+                showWinModal();
+                autoWinModalShown = true;
+              }
+            }
+        }
+      }
+      requestAnimationFrame(animateGroups);
+    }
+    
+    // ================= STAR & SCORE UPDATES =================
+    function updateStars() {
+      CONFIG.winConditions.forEach((condition, index) => {
+        // 1) What rating do we already have?
+        const currentRating = starRatings[index] || 0;
+
+        // 2) Only if this color is fully painted...
+        if (currentGrid.every(row => row.every(cell => cell === condition.color || cell === "X"))) {
+          // 3) Figure out the new rating 0–3
+          let newRating = 0, newStarColor = "";
+          if (movesMade <= condition.optimal) {
+            newRating = 3; newStarColor = "gold";
+          } else if (movesMade <= condition.silver) {
+            newRating = 2; newStarColor = "silver";
+          } else if (movesMade <= condition.bronze) {
+            newRating = 1; newStarColor = "peru";
+          }
+
+          // 4) If we’ve improved, commit it
+          if (newRating > currentRating) {
+            starRatings[index]     = newRating;      // Award points
+            achievedColors[index]  = newStarColor;   // Color for icon
+            document
+              .querySelectorAll(`.objective-star[data-star-index="${index}"]`)
+              .forEach(starElem => {
+                starElem.classList.add("achieved");
+                starElem.classList.replace("fa-regular","fa-solid");
+                starElem.style.color = newStarColor;
+                starElem.style.transform = "scale(1.5)";
+                setTimeout(() => starElem.style.transform = "scale(1)", 300);
+              });
+            updateAchievementsStorage();
+
+            // Free reset flag as before
+            freeResetAvailable = true;
+            updateResetStorage();
+          }
+        }
+      });
+    }
+    
+    function updateScoreDisplay() {
+      let scoreHTML = "";
+      CONFIG.winConditions.forEach((condition, idx) => {
+          const colorHex = letterToHex(condition.color);
+          if (starRatings[idx] > 0 && achievedColors[idx]) {
+              // Achieved star (solid icon)
+              scoreHTML += `
+                  <div class="score-item" style="display:inline-block; text-align:center; margin:0 4px;">
+                    <i class="fa-solid fa-star" 
+                      style="font-size:1.4em; color:${achievedColors[idx]};"></i>
+                    <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+                  </div>`;
+          } else {
+              // Unachieved star (outline icon)
+              scoreHTML += `
+                  <div class="score-item" style="display:inline-block; text-align:center; margin:0 4px;">
+                    <i class="fa-regular fa-star" 
+                      style="font-size:1.4em; color:#ccc;"></i>
+                    <div style="width:30%; height:4px; background-color:${colorHex}; margin:2px auto 0;"></div>
+                  </div>`;
+          }
+      });
+      document.getElementById('score').innerHTML = scoreHTML;
+    }
+
+    // Function to update the objectives dropdown stars based on persisted achievements
+    function updateObjectivesStars() {
+      document.querySelectorAll('.objective-star').forEach(starElem => {
+        const idx = starElem.getAttribute('data-star-index');
+        if (starRatings[idx] > 0 && achievedColors[idx]) {
+          starElem.classList.add("achieved");
+          starElem.classList.replace('fa-regular','fa-solid');
+          starElem.style.color = achievedColors[idx];
+        } else {
+          starElem.classList.remove("achieved");
+          starElem.classList.replace('fa-solid','fa-regular');
+          starElem.style.color = "#fff";
+        }
+      });
+    }
+    
+    // ================= RESET & UNDO =================
+    function resetGame() {
+      // Disallow reset during animation.        
+      if(isAnimating) return;
+      
+      // --- New: Handle reset counter and free reset logic ---
+      if (freeResetAvailable) {
+        // Consume the free reset without incrementing the counter.
+        freeResetAvailable = false;
+      } else {
+        // Increment reset counter if no free reset is available.
+        resetCounter++;
+      }
+      updateResetStorage();
+
+      // --- New: enable undo permanently after enough resets ---
+      if (resetCounter >= UNDO_THRESHOLD && !undoEnabled) {
+        undoEnabled = true;
+        CONFIG.showUndo = true;
+        localStorage.setItem(UNDO_ENABLED_KEY, "true");
+      }
+
+        // Immediately reflect the new undo-visibility
+        if (CONFIG.showUndo) {
+        const btn = document.getElementById('undo');
+        if (btn) btn.style.display = 'inline-block';
+        }
+
+          
+      currentGrid = JSON.parse(JSON.stringify(CONFIG.initialGrid));
+      movesMade = 0;
+      history = [];
+      document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      createGrid();
+    }
+    
+    function undoMove() {
+      if (history.length === 0) return;
+      const lastState = history.pop();
+      currentGrid = lastState.grid;
+      movesMade = lastState.moves;
+      document.getElementById('moves').textContent = `Moves made: ${movesMade}`;
+      updateScoreDisplay();
+      document.querySelectorAll('.tile').forEach((tile, i) => {
+        const row = Math.floor(i / CONFIG.initialGrid[0].length);
+        const col = i % CONFIG.initialGrid[0].length;
+        const letter = currentGrid[row][col];
+        if (letter === "X") {
+          tile.className = 'tile blocked X';
+        } else {
+          tile.className = 'tile ' + letter;
+        }
+      });
+    }
+    
+    // ================= MODAL HANDLING =================
+    function showModal(message, variant) {
+      window.currentModalVariant = variant;
+
+      const modal = document.getElementById('modal');
+      const modalHeader = document.getElementById('modal-header');
+      const modalObj = document.getElementById('modal-objectives');
+
+      // --- Always start by wiping old injections ---
+      // Reset objectives (we'll re-clone below)
+      const rawObjHTML = document
+        .getElementById('objectives-content')
+        .innerHTML
+        .replace(/<span[^>]*class="inner-toggle"[^>]*>.*?<\/span>/g, '');
+      modalObj.innerHTML = rawObjHTML;
+
+      // remove **all** adjacent <hr> separators
+      let next = modalObj.nextElementSibling;
+      while (next && next.tagName === 'HR') {
+        next.remove();
+        next = modalObj.nextElementSibling;
+      }
+
+      const oldWelcome = document.getElementById('modal-welcome-howto');
+      if (oldWelcome) oldWelcome.remove();
+      const oldScoreHTP = document.getElementById('modal-score-howto');
+      if (oldScoreHTP) oldScoreHTP.remove();
+
+      // Hide More-Puzzles by default; each branch will override if needed
+      document.getElementById('modal-more-puzzles').style.display = 'none';
+
+      // ——— 1) WELCOME MODAL ———
+      if (variant === 'welcome') {
+        // Header
+        modalHeader.innerHTML = `
+          <h3 class="welcome-modal-header">
+            Objectives 
+            <i class="fa-solid fa-circle-exclamation" style="color:#FDD538"></i>
+          </h3>
+        `;
+
+        // Remove the default cloned “Objectives:” H3
+        const defaultH3 = document
+            .getElementById('modal-objectives')
+            .querySelector('h3');
+        if (defaultH3) defaultH3.remove();
+
+        // Separator + How-to-Play
+        modalObj.insertAdjacentHTML('afterend','<hr class="modal-separator">');
+        const hrElem = modalObj.nextElementSibling;
+        hrElem.insertAdjacentHTML('afterend', `
+        <div id="modal-welcome-howto" class="modal-howto-section">
+            <h3 class="modal-howto-header">
+            <span>How to Play</span>
+            <button id="welcome-help" class="help-button modal-howto-button">
+                <i class="fa-solid fa-question"></i>
+            </button>
+            </h3>
+            <div id="welcome-howto-content" class="modal-howto-content">
+            ${document
+                .getElementById('how-to-play-content')
+                .innerHTML
+                .replace(/<h3[^>]*>.*?<\/h3>/, '')}
+            </div>
+        </div>
+        `);
+
+        document.getElementById('welcome-help')
+          .addEventListener('click', () => {
+            const c = document.getElementById('welcome-howto-content');
+            c.style.display = c.style.display === 'block' ? 'none' : 'block';
+          });
+        modal.style.display = 'flex';
+        return;
+      }
+
+      // ——— 2) SCORE MODAL ———
+      if (variant === 'score') {
+        const next = modalObj.nextElementSibling;
+        if (next && next.tagName === 'HR') next.remove();
+        const old = document.getElementById('modal-score-howto');
+        if (old) old.remove();
+
+        modalHeader.textContent = message;
+
+        // Separator + How-to-Play
+        modalObj.insertAdjacentHTML('afterend','<hr class="modal-separator">');
+        const hrElem = modalObj.nextElementSibling;
+        hrElem.insertAdjacentHTML('afterend', `
+        <div id="modal-score-howto" class="modal-howto-section">
+            <h3 class="modal-howto-header">
+            <span>How to Play</span>
+            <button id="score-help" class="help-button modal-howto-button">
+                <i class="fa-solid fa-question"></i>
+            </button>
+            </h3>
+            <div id="score-howto-content" class="modal-howto-content">
+            ${document
+                .getElementById('how-to-play-content')
+                .innerHTML
+                .replace(/<h3[^>]*>.*?<\/h3>/, '')}
+            </div>
+        </div>
+        `);
+
+        document.getElementById('score-help')
+          .addEventListener('click', () => {
+            const c = document.getElementById('score-howto-content');
+            c.style.display = c.style.display === 'block' ? 'none' : 'block';
+          });
+
+        if (allObjectivesMet()) {
+        document.getElementById('modal-more-puzzles').style.display = 'block';
+        updateModalPagination();
+        }
+
+        modal.style.display = 'flex';
+        return;
+      }
+
+      // ——— 3) WIN / LOSS (default) ———
+      // Simple text header
+      modalHeader.textContent = message;
+      const isWin = variant === true || variant === 'win';
+      if (isWin) {
+        document.getElementById('modal-more-puzzles').style.display = 'block';
+        updateModalPagination();
+      }
+      modal.style.display = 'flex';
+    }
+
+    // Semantic modal wrappers
+    function showLossModal() {
+      showModal("Nah! Try Again!", false);
+    }
+
+    function showWinModal() {
+      showModal("Bravo! You won!", true);
+    }
+
+    function showScoreModal() {
+      // 1) Sum all points
+      const totalPoints = starRatings.reduce((sum, r) => sum + r, 0);
+      const maxPoints   = CONFIG.winConditions.length * 3;
+      // 2) Convert to grade
+      const grade = getGrade(totalPoints, maxPoints);
+      // 3) Display
+      showModal(`Grade: ${grade}`, 'score');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    /**
+     * Animate the Welcome modal shrinking into the Objectives icon.
+     */
+    function animateAndCloseWelcome() {
+      const modalEl = document.getElementById('modal');
+      const modalContent = modalEl.querySelector('.modal-content');
+      const contentRect = modalContent.getBoundingClientRect();
+      const scoreDiv = document.getElementById('score');
+      const objRect  = scoreDiv.getBoundingClientRect();
+
+      // Clone the modal-content
+      const clone = modalContent.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.top = `${contentRect.top}px`;
+      clone.style.left = `${contentRect.left}px`;
+      clone.style.width = `${contentRect.width}px`;
+      clone.style.height = `${contentRect.height}px`;
+      clone.style.margin = 0;
+      clone.style.transition = 'transform 1.2s ease-in-out, opacity 1.1s ease-out';
+      clone.style.transformOrigin = 'center center';
+      document.body.appendChild(clone);
+
+      // Hide the real modal immediately
+      modalEl.style.display = 'none';
+
+      // Calculate center-to-center offsets
+      const deltaX = (objRect.left + objRect.width/2) - (contentRect.left + contentRect.width/2);
+      const deltaY = (objRect.top  + objRect.height/2) - (contentRect.top  + contentRect.height/2);
+
+      // Trigger the animation on the next frame
+      requestAnimationFrame(() => {
+        clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1)`;
+        clone.style.opacity   = '0';
+      });
+
+      // Clean up when done
+      clone.addEventListener('transitionend', () => clone.remove());
+    }
+
+    // ================= EVENT LISTENERS =================
+    document.getElementById('score').addEventListener('click', showScoreModal);
+
+    // Close-button: animate for Welcome, otherwise normal close
+    document.getElementById('modal-close').addEventListener('click', () => {
+      if (window.currentModalVariant === 'welcome') {
+        animateAndCloseWelcome();
+      } else {
+        closeModal();
+      }
+    });
+
+    // Backdrop click: delegate to the same close-button logic
+    document.getElementById('modal').addEventListener('click', e => {
+      // only if they click exactly on the overlay, not inside the content
+      if (e.target === e.currentTarget) {
+        // trigger the close-button’s click handler
+        document.getElementById('modal-close').click();
+      }
+    });
+
+    // Reset-icon resets the game
+    document.getElementById('reset-button').addEventListener('click', resetGame);
+    document.getElementById('reset-button').addEventListener('touchstart', e => { e.preventDefault(); resetGame(); });
+    
+    // Help-button directly toggles How To Play content
+    document.getElementById('help-button').addEventListener('click', () => {
+      const content = document.getElementById('how-to-play-content');
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    });
+    // Objectives-icon directly toggles the dropdown
+    document.getElementById('objectives-button').addEventListener('click', () => {
+      const content = document.getElementById('objectives-content');
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    });
+
+    // ================= PAGINATION =================    
+    function updatePagePagination() {
+      const pagePagination = document.getElementById("page-pagination");
+      const currentPage = CONFIG.pagination.currentPage;
+      let prevHTML = "";
+      let nextHTML = "";
+      if (CONFIG.pagination.showPrev && currentPage > 1) {
+        prevHTML = '<div class="prev"><a href="' + (currentPage - 1) + '.html" title="Previous Day">' + CONFIG.pagination.prevText + '</a></div>';
+      } else {
+        prevHTML = '<div class="prev"></div>';
+      }
+      if (CONFIG.pagination.showNext && currentPage < CONFIG.pagination.maxPage) {
+        nextHTML = '<div class="next"><a href="' + (currentPage + 1) + '.html" title="Next Day">' + CONFIG.pagination.nextText + '</a></div>';
+      } else {
+        nextHTML = '<div class="next"></div>';
+      }
+      // no center Reset in pagination any more
+      pagePagination.innerHTML = prevHTML + nextHTML;
+    }
+    
+    function updateModalPagination() {
+      const currentPage = CONFIG.pagination.currentPage;
+      let modalPrevHTML = "";
+      let modalNextHTML = "";
+      if (CONFIG.pagination.showPrev && currentPage > 1) {
+        modalPrevHTML = '<a href="' + (currentPage - 1) + '.html" title="Previous Day">⏪</a>';
+      }
+      if (CONFIG.pagination.showNext && currentPage < CONFIG.pagination.maxPage) {
+        modalNextHTML = '<a href="' + (currentPage + 1) + '.html" title="Next Day">⏩</a>';
+      }
+      document.getElementById("modal-prev").innerHTML = modalPrevHTML;
+      document.getElementById("modal-center").innerHTML = "";
+      document.getElementById("modal-next").innerHTML = modalNextHTML;
+    }
+    
+    // ================= INITIALIZATION =================
+    // Populate objectives dropdown dynamically
+    document.getElementById('objectives-content').innerHTML = generateObjectivesHTML();
+    // Update objective stars based on persisted achievements data
+    updateObjectivesStars();
+
+    resetGame();
+    createGrid();
+    updatePagePagination();
+    updateScoreDisplay();
+
+    // Show Welcome only to brand‐new users, otherwise show Win modal
+    if (!allObjectivesMet()) {
+    showModal('', 'welcome');
+    } else {
+    showModal("Bravo! You won!", true);
+    }
+
+    
+    // ——— Undo Button: single hookup for click + touch ———
+    const undoBtn = document.getElementById('undo');
+    undoBtn.addEventListener('click', undoMove);
+    undoBtn.addEventListener('touchstart', e => { 
+      e.preventDefault(); 
+      undoMove(); 
+    });
+
+    // Attach color button event listeners
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Disallow changing color during animation.
+        if(isAnimating) return;
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedColor = hexToLetter(btn.dataset.color);
+        // Unlock the AudioContext on iOS if necessary:
+        if (typeof audioContext !== 'undefined' && audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+      });
+      btn.addEventListener('touchstart', (e) => { e.preventDefault(); btn.click(); });
+    });
+    
+    // Show or hide the undo button based on config or resets
+    if (CONFIG.showUndo) {
+      undoBtn.style.display = 'inline-block';
+    } else {
+      undoBtn.style.display = 'none';
+    }
+ 
+    // Close Objectives on inner ▲ click
+    document.getElementById('objectives-content').addEventListener('click', e => {
+      if (e.target.id === 'objectives-close') {
+        document.getElementById('objectives-content').style.display = 'none';
+      }
+    });
+    // Close How-to-Play on inner ▲ click
+    document.getElementById('how-to-play-content').addEventListener('click', e => {
+      if (e.target.id === 'howto-close') {
+        document.getElementById('how-to-play-content').style.display = 'none';
+      }
+    });
+
+  </script>
+
+  <!-- Clicky Analytics -->
+  <script async data-id="101482773" src="//static.getclicky.com/js"></script>
+  <noscript>
+    <p style="display: none;">
+      <img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101482773ns.gif" />
+    </p>
+  </noscript>
+    
+</body>
+</html>
