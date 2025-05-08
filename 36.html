@@ -117,8 +117,8 @@
       background: transparent;
       border: 1px solid #fff; /* default white for help */
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 27px;
+      height: 27px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -130,8 +130,8 @@
     /* Objectives icon—transparent ring, same size as help-button */
     #objectives-button {
       /* match the help-button’s border-box sizing */
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border: 1px solid transparent;  /* preserve 1px “ring” for consistent box-sizing */
       border-radius: 50%;
       
@@ -652,27 +652,27 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["G", "B", "B", "R", "B", "R", "R", "Y"],
-        ["B", "B", "R", "B", "B", "B", "R", "R"],
-        ["B", "R", "B", "B", "G", "B", "G", "R"],
-        ["R", "B", "B", "Y", "B", "G", "B", "B"],
-        ["B", "B", "Y", "B", "B", "B", "G", "B"],
-        ["B", "B", "B", "G", "B", "R", "B", "B"],
-        ["G", "B", "G", "B", "R", "B", "B", "Y"],
-        ["Y", "G", "B", "B", "B", "B", "Y", "G"],
-        ["Y", "Y", "G", "B", "B", "Y", "G", "G"],
-        ["B", "Y", "Y", "B", "Y", "G", "G", "R"]
+        ["G", "B", "B", "B", "B", "B", "B", "G"],
+        ["B", "G", "B", "B", "B", "B", "G", "B"],
+        ["B", "B", "G", "B", "B", "G", "X", "B"],
+        ["B", "X", "X", "X", "X", "R", "X", "B"],
+        ["B", "X", "Y", "R", "X", "R", "R", "B"],
+        ["B", "G", "G", "X", "X", "R", "R", "B"],
+        ["B", "X", "R", "Y", "Y", "R", "X", "B"],
+        ["B", "X", "X", "Y", "Y", "X", "X", "B"],
+        ["B", "Y", "B", "B", "B", "B", "Y", "B"],
+        ["Y", "Y", "B", "B", "B", "B", "Y", "Y"]
       ],
       maxMoves: 9,
       winConditions: [
         { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
         { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
         { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
-        // { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
+        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 35,
+        currentPage: 36,
         maxPage: 36,
         showPrev: true,
         showNext: true,
