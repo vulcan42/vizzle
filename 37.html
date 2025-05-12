@@ -652,27 +652,27 @@
     // ================= CONFIG SECTION =================
     const CONFIG = {
       initialGrid: [
-        ["G", "B", "B", "B", "B", "B", "B", "G"],
-        ["B", "G", "B", "B", "B", "B", "G", "B"],
-        ["B", "B", "G", "B", "B", "G", "X", "B"],
-        ["B", "X", "X", "X", "X", "R", "X", "B"],
-        ["B", "X", "Y", "R", "X", "R", "R", "B"],
-        ["B", "G", "G", "X", "X", "R", "R", "B"],
-        ["B", "X", "R", "Y", "Y", "R", "X", "B"],
-        ["B", "X", "X", "Y", "Y", "X", "X", "B"],
-        ["B", "Y", "B", "B", "B", "B", "Y", "B"],
-        ["Y", "Y", "B", "B", "B", "B", "Y", "Y"]
+        ["G", "G", "G", "G", "G", "B", "B", "R"],
+        ["G", "B", "B", "B", "Y", "B", "X", "X"],
+        ["G", "B", "B", "B", "Y", "B", "X", "B"],
+        ["G", "B", "B", "B", "Y", "X", "X", "G"],
+        ["G", "Y", "Y", "G", "R", "B", "B", "B"],
+        ["B", "B", "B", "R", "G", "Y", "Y", "R"],
+        ["B", "X", "X", "Y", "B", "B", "B", "R"],
+        ["R", "X", "B", "Y", "B", "B", "B", "R"],
+        ["X", "X", "B", "Y", "B", "B", "B", "R"],
+        ["G", "B", "B", "R", "R", "R", "R", "R"]
       ],
       maxMoves: 9,
       winConditions: [
-        { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 (Best - 6 moves)" },
-        { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 (Best - 6 moves)" },
-        { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 (Best - 6 moves)" },
-        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 (Best - 6 moves)" }
+        { color: "R", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Red 🟥 in 6 moves" },
+        { color: "G", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Green 🟩 in moves" },
+        // { color: "B", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Blue 🟦 in 6 moves" },
+        { color: "Y", optimal: 6, silver: 7, bronze: 8, description: "Turn all tiles to Yellow 🟨 in 6 moves" }
       ],
       scoringOrder: ["R", "G", "B", "Y"],
       pagination: {
-        currentPage: 36,
+        currentPage: 37,
         maxPage: 37,
         showPrev: true,
         showNext: true,
